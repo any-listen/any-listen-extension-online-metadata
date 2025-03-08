@@ -1,0 +1,19 @@
+{
+  "prettier.useEditorConfig": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.stylelint": "explicit",
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["svelte", "javascript", "typescript"],
+  "i18n-ally.localesPaths": ["i18n"],
+  // "i18n-ally.fullReloadOnChanged": true,
+  "i18n-ally.keystyle": "flat",
+  "i18n-ally.displayLanguage": "zh-cn",
+  "i18n-ally.sourceLanguage": "zh-cn",
+  "i18n-ally.translate.engines": ["google-cn", "google"],
+  "i18n-ally.sortKeys": true,
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

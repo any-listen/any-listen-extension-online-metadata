@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": false,
+    "module": "ESNext",
+    "checkJs": true,
+    "moduleResolution": "Node",
+    "composite": true,
+    "outDir": "./dist",
+    "allowSyntheticDefaultImports": true,
+    "types": ["@types/node"]
+  },
+  "include": ["scripts/**/*.js", "package.json"]
+}
