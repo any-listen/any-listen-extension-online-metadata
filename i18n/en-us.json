@@ -1,11 +1,8 @@
 {
   "count_billion": "{num}",
   "count_ten_thousand": "{num} ten thousand",
-  "description": "This is the description of the source",
-  "displayName": "Test demo source 1",
-  "onlineResource.picNotFound": "Failed to obtain the image",
-  "sName": "Source 1",
-  "sName2": "Source 2",
-  "test1.description": "Setting 1 description",
-  "test1.name": "Setting 1"
+  "description": "Match online song covers, lyrics from playing songs",
+  "displayName": "Online song information",
+  "kwName": "Kuwo Music",
+  "onlineResource.picNotFound": "Failed to obtain the image"
 }

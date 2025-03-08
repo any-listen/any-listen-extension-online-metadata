@@ -1,13 +1,8 @@
 {
   "count_billion": "{num} 亿",
   "count_ten_thousand": "{num} 万",
-  "description": "这是源的描述",
-  "displayName": "测试demo源1",
+  "description": "从播放的歌曲匹配在线歌曲封面、歌词",
+  "displayName": "在线歌曲信息",
   "onlineResource.picNotFound": "获取图片失败",
-  "sName": "源1",
-  "sName2": "源2",
-  "test1.description": "设置1描述",
-  "test1.name": "设置1",
-  "test4.left.description": "左边",
-  "test4.right.description": "右边"
+  "kwName": "酷我音乐"
 }
