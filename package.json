@@ -25,42 +25,6 @@
           "musicPic",
           "lyric"
         ]
-      },
-      {
-        "id": "kg",
-        "name": "{kgName}",
-        "resource": [
-          "musicPic",
-          "musicUrl",
-          "lyric"
-        ]
-      },
-      {
-        "id": "tx",
-        "name": "{txName}",
-        "resource": [
-          "musicPic",
-          "musicUrl",
-          "lyric"
-        ]
-      },
-      {
-        "id": "wy",
-        "name": "{wyName}",
-        "resource": [
-          "musicPic",
-          "musicUrl",
-          "lyric"
-        ]
-      },
-      {
-        "id": "mg",
-        "name": "{mgName}",
-        "resource": [
-          "musicPic",
-          "musicUrl",
-          "lyric"
-        ]
       }
     ]
   },

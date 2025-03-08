@@ -38,7 +38,7 @@ export const searchMusic = async ({
   const musicName = trimStr(name)
   const tasks = []
   for (const source of Object.keys(sources) as (keyof typeof sources)[]) {
-    if (!('musicSearch' in sources[source]) || source == s) continue
+    if (!sources[source] || !('musicSearch' in sources[source]) || source == s) continue
     tasks.push(sources[source].musicSearch(`${musicName} ${singer || ''}`.trim(), 1, limit).catch(() => null))
   }
   return (await Promise.all(tasks)).filter((s) => s != null)

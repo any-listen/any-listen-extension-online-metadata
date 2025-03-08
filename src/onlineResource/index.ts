@@ -1,13 +1,5 @@
 import { registerResourceAction, t } from '@/shared/hostApi'
-import kw from './kw'
-
-const sources = {
-  kw,
-  tx: null,
-  wy: null,
-  kg: null,
-  mg: null,
-} as const
+import { sources } from './sources'
 
 // type Sources = 'kw' | 'tx' | 'wy' | 'kg' | 'mg'
 type Sources = 'kw' | 'tx' | 'wy' | 'kg' | 'mg'
