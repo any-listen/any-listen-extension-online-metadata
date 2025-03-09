@@ -57,6 +57,7 @@ declare namespace AnyListen {
       duration: number
       index: number
       listId: string | null
+      isOnline: boolean
       historyIndex: number
     }
 
@@ -532,6 +533,7 @@ declare namespace AnyListen {
       info: SavedPlayInfo
       list: Player.PlayMusicInfo[]
       listId: string | null
+      isOnline: boolean
       historyList: PlayHistoryListItem[]
       isCollect: boolean
     }
