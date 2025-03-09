@@ -32,7 +32,7 @@ jobs:
         env:
           PRI_KEY: ${{ secrets.PRI_KEY }}
           PUB_KEY: ${{ secrets.PUB_KEY }}
-        run: npm run build
+        run: npm run build:publish
 
       - name: Get package info
         run: |

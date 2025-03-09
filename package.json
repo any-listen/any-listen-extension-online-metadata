@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --env-file=.env scripts/dev.js",
-    "build": "node --env-file=.env scripts/build.js"
+    "build": "node --env-file=.env scripts/build.js",
+    "build:publish": "node scripts/build.js"
   },
   "homepage": "https://github.com/any-listen/any-listen-extension-online-metadata#readme",
   "license": "Apache-2.0",
