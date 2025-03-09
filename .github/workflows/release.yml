@@ -19,9 +19,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -32,6 +29,9 @@ jobs:
         run: pnpm install
 
       - name: Build src code
+        env:
+          PRI_KEY: ${{ secrets.PRI_KEY }}
+          PUB_KEY: ${{ secrets.PUB_KEY }}
         run: npm run build
 
       - name: Get package info
