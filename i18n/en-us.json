@@ -3,6 +3,8 @@
   "count_ten_thousand": "{num} ten thousand",
   "description": "Match online song covers, lyrics from playing songs",
   "displayName": "Online song information",
-  "kwName": "Kuwo Music",
+  "kwName": "Kuwo",
+  "txName": "Tencent",
+  "wyName": "NetEase",
   "onlineResource.picNotFound": "Failed to obtain the image"
 }

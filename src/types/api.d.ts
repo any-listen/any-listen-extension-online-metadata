@@ -624,6 +624,7 @@ declare global {
   namespace AnyListen_API {
     type MusicInfo = AnyListen.Music.MusicInfo
     type MusicInfoOnline = AnyListen.Music.MusicInfoOnline
+    type MusicLyricInfo = AnyListen.Music.LyricInfo
     type Locale =
       | 'ar-sa'
       | 'cs-cz'
@@ -670,20 +671,25 @@ declare global {
 
     type ParamsData = Record<string, string | number | null | undefined | boolean>
     interface RequestOptions {
-      method?: 'get' | 'head' | 'delete' | 'patch' | 'post' | 'put'
+      method?: 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'PATCH'
+      query?: Record<string, string | number | null | undefined | boolean>
+      headers?: Record<string, string | string[]>
       timeout?: number
-      headers?: Record<string, string>
-      body?: string
-      form?: ParamsData
-      params?: Record<string, string>
-      // formData?: Options['fo']
-      // binary?: Options['method']
+      maxRedirect?: number
+      signal?: AbortController['signal']
+      json?: Record<string, unknown>
+      form?: Record<string, string | number | null | undefined | boolean>
+      binary?: Uint8Array
+      text?: string
+      formdata?: Record<string, string | Uint8Array>
+      xml?: string
+      needRaw?: boolean
     }
     interface Response<Resp> {
       statusCode?: number
-      statusMessage?: string
+      // statusMessage?: string
       headers: Record<string, string | string[] | undefined>
-      raw: ArrayBuffer
+      raw: Uint8Array
       body: Resp
     }
 
@@ -909,10 +915,14 @@ declare global {
       bufToString: <T extends BufferFormat>(buf: number[] | Uint8Array, format: T) => BufferToStringTypes[T]
     }
     interface Crypto {
-      aesEncrypt: (mode: AES_MODE, b64Data: string, b64Key: string, b64iv: string) => string
-      rsaEncrypt: (mode: RSA_PADDING, b64Data: string, b64Key: string) => string
+      aesEncrypt: (mode: AES_MODE, data: Uint8Array | string, key: Uint8Array | string, iv: Uint8Array | string) => string
+      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array | string, key: Uint8Array | string) => string
       randomBytes: (size: number) => Uint8Array
       md5: (b64Data: string) => string
+    }
+    interface Iconv {
+      decode: (data: Uint8Array | Uint16Array, encoding: string) => string
+      encode: (data: string, encoding: string) => Uint8Array
     }
     interface Configuration {
       getConfigs: (key: string[]) => Promise<string[]>
@@ -935,6 +945,7 @@ declare global {
       utils: {
         buffer: Buffer
         crypto: Crypto
+        iconv: Iconv
       }
     }
   }

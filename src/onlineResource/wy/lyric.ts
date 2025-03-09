@@ -1,42 +1,10 @@
-import { httpFetch } from '../../request'
+import { console, request } from '@/shared/hostApi'
 import { eapi } from './utils/crypto'
-// import { decodeName } from '../..'
+import { Lyric } from './types/lyric'
 
-// const parseLyric = (str, lrc) => {
-//   if (!str) return ''
-
-//   str = str.replace(/\r/g, '')
-
-//   let lxlyric = str.replace(/\[((\d+),\d+)\].*/g, str => {
-//     let result = str.match(/\[((\d+),\d+)\].*/)
-//     let time = parseInt(result[2])
-//     let ms = time % 1000
-//     time /= 1000
-//     let m = parseInt(time / 60).toString().padStart(2, '0')
-//     time %= 60
-//     let s = parseInt(time).toString().padStart(2, '0')
-//     time = `${m}:${s}.${ms}`
-//     str = str.replace(result[1], time)
-
-//     let startTime = 0
-//     str = str.replace(/\(0,1\) /g, ' ').replace(/\(\d+,\d+\)/g, time => {
-//       const [start, end] = time.replace(/^\((\d+,\d+)\)$/, '$1').split(',')
-
-//       time = `<${parseInt(startTime + parseInt(start))},${end}>`
-//       startTime = parseInt(startTime + parseInt(end))
-//       return time
-//     })
-
-//     return str
-//   })
-
-//   lxlyric = decodeName(lxlyric)
-//   return lxlyric.trim()
-// }
-
-const eapiRequest = (url, data) => {
-  return httpFetch('https://interface3.music.163.com/eapi/song/lyric/v1', {
-    method: 'post',
+const eapiRequest = async <T = unknown>(url: string, data: object) => {
+  const resp = await request<T>('https://interface3.music.163.com/eapi/song/lyric/v1', {
+    method: 'POST',
     headers: {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
       origin: 'https://music.163.com',
@@ -44,14 +12,19 @@ const eapiRequest = (url, data) => {
     },
     form: eapi(url, data),
   })
-  // requestObj.promise = requestObj.promise.then(({ body }) => {
-  //   // console.log(raw)
-  //   console.log(body)
-  //   // console.log(eapiDecrypt(raw))
-  //   // return eapiDecrypt(raw)
-  //   return body
-  // })
-  // return requestObj
+  if (typeof resp.body == 'string') resp.body = JSON.parse(resp.body as string)
+  return resp
+}
+
+interface Info {
+  t: number
+  c: C[]
+}
+
+interface C {
+  tx: string
+  li?: string
+  or?: string
 }
 
 const parseTools = {
@@ -61,22 +34,24 @@ const parseTools = {
     wordTime: /\(\d+,\d+,\d+\)/,
     wordTimeAll: /(\(\d+,\d+,\d+\))/g,
   },
-  msFormat(timeMs) {
+  msFormat(timeMs: number) {
     if (Number.isNaN(timeMs)) return ''
-    let ms = timeMs % 1000
+    const ms = timeMs % 1000
     timeMs /= 1000
-    let m = parseInt(timeMs / 60).toString().padStart(2, '0')
+    const m = Math.trunc(timeMs / 60)
+      .toString()
+      .padStart(2, '0')
     timeMs %= 60
-    let s = parseInt(timeMs).toString().padStart(2, '0')
+    const s = Math.trunc(timeMs).toString().padStart(2, '0')
     return `[${m}:${s}.${ms}]`
   },
-  parseLyric(lines) {
+  parseLyric(lines: string[]) {
     const lxlrcLines = []
     const lrcLines = []
 
     for (let line of lines) {
       line = line.trim()
-      let result = this.rxps.lineTime.exec(line)
+      const result = this.rxps.lineTime.exec(line)
       if (!result) {
         if (line.startsWith('[offset')) {
           lxlrcLines.push(line)
@@ -89,56 +64,56 @@ const parseTools = {
       const startTimeStr = this.msFormat(startMsTime)
       if (!startTimeStr) continue
 
-      let words = line.replace(this.rxps.lineTime, '')
+      const words = line.replace(this.rxps.lineTime, '')
 
       lrcLines.push(`${startTimeStr}${words.replace(this.rxps.wordTimeAll, '')}`)
 
-      let times = words.match(this.rxps.wordTimeAll)
+      const times = words.match(this.rxps.wordTimeAll)
       if (!times) continue
-      times = times.map(time => {
-        const result = /\((\d+),(\d+),\d+\)/.exec(time)
+      const formatTimes = times.map((time) => {
+        const result = /\((\d+),(\d+),\d+\)/.exec(time)!
         return `<${Math.max(parseInt(result[1]) - startMsTime, 0)},${result[2]}>`
       })
       const wordArr = words.split(this.rxps.wordTime)
       wordArr.shift()
-      const newWords = times.map((time, index) => `${time}${wordArr[index]}`).join('')
+      const newWords = formatTimes.map((time, index) => `${time}${wordArr[index]}`).join('')
       lxlrcLines.push(`${startTimeStr}${newWords}`)
     }
     return {
       lyric: lrcLines.join('\n'),
-      lxlyric: lxlrcLines.join('\n'),
+      awlyric: lxlrcLines.join('\n'),
     }
   },
-  parseHeaderInfo(str) {
+  parseHeaderInfo(str: string) {
     str = str.trim()
     str = str.replace(/\r/g, '')
     if (!str) return null
     const lines = str.split('\n')
-    return lines.map(line => {
+    return lines.map((line) => {
       if (!this.rxps.info.test(line)) return line
       try {
-        const info = JSON.parse(line)
+        const info = JSON.parse(line) as Info
         const timeTag = this.msFormat(info.t)
-        return timeTag ? `${timeTag}${info.c.map(t => t.tx).join('')}` : ''
+        return timeTag ? `${timeTag}${info.c.map((t) => t.tx).join('')}` : ''
       } catch {
         return ''
       }
     })
   },
-  getIntv(interval) {
+  getIntv(interval?: string) {
     if (!interval) return 0
     if (!interval.includes('.')) interval += '.0'
-    let arr = interval.split(/:|\./)
+    const arr = interval.split(/:|\./)
     while (arr.length < 3) arr.unshift('0')
     const [m, s, ms] = arr
     return parseInt(m) * 3600000 + parseInt(s) * 1000 + parseInt(ms)
   },
-  fixTimeTag(lrc, targetlrc) {
+  fixTimeTag(lrc: string, targetlrc: string) {
     let lrcLines = lrc.split('\n')
     const targetlrcLines = targetlrc.split('\n')
     const timeRxp = /^\[([\d:.]+)\]/
-    let temp = []
-    let newLrc = []
+    let temp: string[] = []
+    const newLrc: string[] = []
     targetlrcLines.forEach((line) => {
       const result = timeRxp.exec(line)
       if (!result) return
@@ -147,7 +122,7 @@ const parseTools = {
       const t1 = this.getIntv(result[1])
 
       while (lrcLines.length) {
-        const lrcLine = lrcLines.shift()
+        const lrcLine = lrcLines.shift()!
         const lrcLineResult = timeRxp.exec(lrcLine)
         if (!lrcLineResult) continue
         const t2 = this.getIntv(lrcLineResult[1])
@@ -164,15 +139,15 @@ const parseTools = {
     })
     return newLrc.join('\n')
   },
-  parse(ylrc, ytlrc, yrlrc, lrc, tlrc, rlrc) {
+  parse(ylrc?: string, ytlrc?: string, yrlrc?: string, lrc?: string, tlrc?: string, rlrc?: string) {
     const info = {
       lyric: '',
       tlyric: '',
       rlyric: '',
-      lxlyric: '',
+      awlyric: '',
     }
     if (ylrc) {
-      let lines = this.parseHeaderInfo(ylrc)
+      const lines = this.parseHeaderInfo(ylrc)
       if (lines) {
         const result = this.parseLyric(lines)
         if (ytlrc) {
@@ -193,9 +168,9 @@ const parseTools = {
         }
 
         const timeRxp = /^\[[\d:.]+\]/
-        const headers = lines.filter(l => timeRxp.test(l)).join('\n')
+        const headers = lines.filter((l) => timeRxp.test(l)).join('\n')
         info.lyric = `${headers}\n${result.lyric}`
-        info.lxlyric = result.lxlyric
+        info.awlyric = result.awlyric
         return info
       }
     }
@@ -216,46 +191,16 @@ const parseTools = {
   },
 }
 
-
-// https://github.com/Binaryify/NeteaseCloudMusicApi/pull/1523/files
-// export default songmid => {
-//   const requestObj = httpFetch('https://music.163.com/api/linux/forward', {
-//     method: 'post',
-//     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
-//     form: linuxapi({
-//       method: 'POST',
-//       url: 'https://music.163.com/api/song/lyric?_nmclfl=1',
-//       params: {
-//         id: songmid,
-//         tv: -1,
-//         lv: -1,
-//         rv: -1,
-//         kv: -1,
-//       },
-//     }),
-//   })
-//   requestObj.promise = requestObj.promise.then(({ body }) => {
-//     if (body.code !== 200 || !body?.lrc?.lyric) return Promise.reject(new Error('Get lyric failed'))
-//     // console.log(body)
-//     return {
-//       lyric: body.lrc.lyric,
-//       tlyric: body.tlyric?.lyric ?? '',
-//       rlyric: body.romalrc?.lyric ?? '',
-//       // lxlyric: parseLyric(body.klyric.lyric),
-//     }
-//   })
-//   return requestObj
-// }
-
 // https://github.com/lyswhut/lx-music-mobile/issues/370
-const fixTimeLabel = (lrc, tlrc, romalrc) => {
+const fixTimeLabel = (lrc: string, tlrc?: string, romalrc?: string) => {
   if (lrc) {
-    let newLrc = lrc.replace(/\[(\d{2}:\d{2}):(\d{2})]/g, '[$1.$2]')
-    let newTlrc = tlrc?.replace(/\[(\d{2}:\d{2}):(\d{2})]/g, '[$1.$2]') ?? tlrc
+    const newLrc = lrc.replace(/\[(\d{2}:\d{2}):(\d{2})]/g, '[$1.$2]')
+    const newTlrc = tlrc?.replace(/\[(\d{2}:\d{2}):(\d{2})]/g, '[$1.$2]') ?? tlrc
     if (newLrc != lrc || newTlrc != tlrc) {
       lrc = newLrc
       tlrc = newTlrc
-      if (romalrc) romalrc = romalrc.replace(/\[(\d{2}:\d{2}):(\d{2,3})]/g, '[$1.$2]').replace(/\[(\d{2}:\d{2}\.\d{2})0]/g, '[$1]')
+      if (romalrc)
+        romalrc = romalrc.replace(/\[(\d{2}:\d{2}):(\d{2,3})]/g, '[$1.$2]').replace(/\[(\d{2}:\d{2}\.\d{2})0]/g, '[$1]')
     }
   }
 
@@ -263,9 +208,9 @@ const fixTimeLabel = (lrc, tlrc, romalrc) => {
 }
 
 // https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/module/lyric_new.js
-export default songmid => {
-  const requestObj = eapiRequest('/api/song/lyric/v1', {
-    id: songmid,
+export const getLyric = async ({ meta }: AnyListen_API.MusicInfo) => {
+  const { body } = await eapiRequest<Lyric>('/api/song/lyric/v1', {
+    id: meta.musicId,
     cp: false,
     tv: 0,
     lv: 0,
@@ -275,14 +220,19 @@ export default songmid => {
     ytv: 0,
     yrv: 0,
   })
-  requestObj.promise = requestObj.promise.then(({ body }) => {
-    // console.log(body)
-    if (body.code !== 200 || !body?.lrc?.lyric) return Promise.reject(new Error('Get lyric failed'))
-    const fixTimeLabelLrc = fixTimeLabel(body.lrc.lyric, body.tlyric?.lyric, body.romalrc?.lyric)
-    const info = parseTools.parse(body.yrc?.lyric, body.ytlrc?.lyric, body.yromalrc?.lyric, fixTimeLabelLrc.lrc, fixTimeLabelLrc.tlrc, fixTimeLabelLrc.romalrc)
-    // console.log(info)
-    if (!info.lyric) return Promise.reject(new Error('Get lyric failed'))
-    return info
-  })
-  return requestObj
+  // console.log(body)
+  if (body.code !== 200 || !body?.lrc?.lyric) return Promise.reject(new Error('Get lyric failed'))
+  const fixTimeLabelLrc = fixTimeLabel(body.lrc.lyric, body.tlyric?.lyric, body.romalrc?.lyric)
+  const info = parseTools.parse(
+    body.yrc?.lyric,
+    body.ytlrc?.lyric,
+    body.yromalrc?.lyric,
+    fixTimeLabelLrc.lrc,
+    fixTimeLabelLrc.tlrc,
+    fixTimeLabelLrc.romalrc
+  )
+  // console.log(info)
+  if (!info.lyric) return Promise.reject(new Error('Get lyric failed'))
+  console.log('wy lyric:', meta.musicId)
+  return info
 }

@@ -1,6 +1,6 @@
 import { console, request } from '@/shared/hostApi'
 import { formatSinger } from './util'
-import { SearchResult } from './types/search'
+import { SearchResult } from './types/musicSearch'
 import { decodeName, formatPlayTime } from '@/shared/utils'
 
 const regExps = {
@@ -74,7 +74,7 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
       meta: {
         albumName: info.ALBUM ? decodeName(info.ALBUM) : '',
         source: 'kw',
-        musicId: songId,
+        musicId: String(songId),
         qualitys: types,
         createTime: 0,
         posTime: 0,

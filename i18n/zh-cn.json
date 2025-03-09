@@ -4,5 +4,7 @@
   "description": "从播放的歌曲匹配在线歌曲封面、歌词",
   "displayName": "在线歌曲信息",
   "onlineResource.picNotFound": "获取图片失败",
-  "kwName": "酷我音乐"
+  "kwName": "酷我音乐",
+  "txName": "企鹅音乐",
+  "wyName": "网易音乐"
 }

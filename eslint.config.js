@@ -14,5 +14,10 @@ export default [
       globals: globals.node,
     },
   },
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  },
   { ignores: ['dist', 'build', 'node_modules'] },
 ]

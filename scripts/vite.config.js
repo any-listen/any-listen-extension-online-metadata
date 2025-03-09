@@ -17,6 +17,7 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'esnext',
     emptyOutDir: true,
     minify: false,
     watch: isProd

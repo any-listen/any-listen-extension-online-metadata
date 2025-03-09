@@ -1,8 +1,5 @@
 import { registerResourceAction, t } from '@/shared/hostApi'
-import { sources } from './sources'
-
-// type Sources = 'kw' | 'tx' | 'wy' | 'kg' | 'mg'
-type Sources = 'kw' | 'tx' | 'wy' | 'kg' | 'mg'
+import { Sources, sources } from './sources'
 
 export const initOnlineResource = () => {
   registerResourceAction({
@@ -32,7 +29,7 @@ export const initOnlineResource = () => {
         interval: params.musicInfo.interval,
         lyric: lyric.lyric,
         tlyric: lyric.tlyric,
-        awlyric: lyric.lxlyric,
+        awlyric: lyric.awlyric,
         rlyric: lyric.rlyric,
       }
     },

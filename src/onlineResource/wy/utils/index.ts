@@ -1,9 +1,9 @@
-import { httpFetch } from '../../../request'
+import { request } from '@/shared/hostApi'
 import { eapi } from './crypto'
 
-export const eapiRequest = (url, data) => {
-  return httpFetch('http://interface.music.163.com/eapi/batch', {
-    method: 'post',
+export const eapiRequest = async <T = unknown>(url: string, data: object) => {
+  const resp = await request<T>('http://interface.music.163.com/eapi/batch', {
+    method: 'POST',
     headers: {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
       origin: 'https://music.163.com',
@@ -11,12 +11,6 @@ export const eapiRequest = (url, data) => {
     },
     form: eapi(url, data),
   })
-  // requestObj.promise = requestObj.promise.then(({ body }) => {
-  //   // console.log(raw)
-  //   console.log(body)
-  //   // console.log(eapiDecrypt(raw))
-  //   // return eapiDecrypt(raw)
-  //   return body
-  // })
-  // return requestObj
+  if (typeof resp.body == 'string') resp.body = JSON.parse(resp.body as string)
+  return resp
 }

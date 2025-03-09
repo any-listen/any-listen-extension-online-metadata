@@ -1,4 +1,4 @@
-import { t } from '@/shared/hostApi'
+import { buffer, t } from '@/shared/hostApi'
 import he from 'he'
 
 export * from './common'
@@ -54,4 +54,8 @@ export const formatPlayCount = (num: number): string => {
 export const decodeName = (str: string | null = '') => {
   if (!str) return ''
   return he.decode(str)
+}
+
+export const b64DecodeUnicode = (str: string): string => {
+  return buffer.bufToString(buffer.from(str, 'base64'), 'utf8')
 }

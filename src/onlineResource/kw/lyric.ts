@@ -1,4 +1,4 @@
-import { buffer, request } from '@/shared/hostApi'
+import { buffer, console, request } from '@/shared/hostApi'
 import { lrcTools } from './util'
 import decodeLyric from './decodeLyric'
 import { decodeName } from '@/shared/utils'
@@ -101,14 +101,16 @@ const parseLrc = (lrc: string) => {
 }
 export const getLyric = async (musicInfo: AnyListen_API.MusicInfo, isGetLyricx = true) => {
   // getLyric2(musicInfo)
-  const resp = await request<string>(`http://newlyric.kuwo.cn/newlyric.lrc?${buildParams(musicInfo.id, isGetLyricx)}`)
+  const resp = await request<string>(`http://newlyric.kuwo.cn/newlyric.lrc?${buildParams(musicInfo.id, isGetLyricx)}`, {
+    needRaw: true,
+  })
   if (resp.statusCode != 200) throw new Error(JSON.stringify(resp.body))
-  const rawLrc = await decodeLyric(buffer.from(resp.body), isGetLyricx)
+  const rawLrc = await decodeLyric(resp.raw, isGetLyricx)
   // console.log(Buffer.from(base64Data, 'base64').toString())
   let lrcInfo: {
     lyric: string
     tlyric: string
-    lxlyric?: string
+    awlyric?: string
     rlyric?: string
   }
   try {
@@ -119,12 +121,13 @@ export const getLyric = async (musicInfo: AnyListen_API.MusicInfo, isGetLyricx =
   // console.log(lrcInfo)
   if (lrcInfo.tlyric) lrcInfo.tlyric = lrcInfo.tlyric.replace(lrcTools.rxps.wordTimeAll, '')
   try {
-    lrcInfo.lxlyric = lrcTools.parse(lrcInfo.lyric)
+    lrcInfo.awlyric = lrcTools.parse(lrcInfo.lyric)
   } catch {
-    lrcInfo.lxlyric = ''
+    lrcInfo.awlyric = ''
   }
   lrcInfo.lyric = lrcInfo.lyric.replace(lrcTools.rxps.wordTimeAll, '')
   if (!existTimeExp.test(lrcInfo.lyric)) return Promise.reject(new Error('Get lyric failed'))
   // console.log(lrcInfo)
+  console.log('kw lyric:', musicInfo.meta.musicId)
   return lrcInfo
 }
