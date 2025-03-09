@@ -34,8 +34,8 @@ const verifySignature = (data, publicKey, signature) => {
   return isValid
 }
 
-const packFile = ({ gzip, cwd, files, dist }) =>
-  new Promise((resolve, reject) => {
+const packFile = async ({ gzip, cwd, files, dist }) => {
+  return new Promise((resolve, reject) => {
     c(
       {
         gzip,
@@ -44,9 +44,12 @@ const packFile = ({ gzip, cwd, files, dist }) =>
       files
     )
       .pipe(fs.createWriteStream(dist))
-      .on('finish', resolve)
+      .on('finish', () => {
+        resolve()
+      })
       .on('error', reject)
   })
+}
 
 export const pack = async () => {
   const sourceDir = getSourceDir()
@@ -71,6 +74,6 @@ export const pack = async () => {
     gzip: true,
     cwd: unpackedDir,
     files: [EXTENSION.extBundleFileName, EXTENSION.signFileName],
-    dist: path.join(getOutDir(), `${pkg.name}-v${pkg.version}.${EXTENSION.pkgExtName}`),
+    dist: path.join(getOutDir(), `${pkg.name}_v${pkg.version}.${EXTENSION.pkgExtName}`),
   })
 }
