@@ -21,7 +21,7 @@ export const initOnlineResource = () => {
       if (!pic) throw new Error(t('onlineResource.picNotFound'))
       return pic
     },
-    async lyric(params) {
+    async musicLyric(params) {
       const lyric = await sources[params.source as Sources]!.getLyric(params.musicInfo)
       return {
         name: params.musicInfo.name,

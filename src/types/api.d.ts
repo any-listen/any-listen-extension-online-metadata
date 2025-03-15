@@ -556,13 +556,18 @@ interface CommonListParams extends CommonParams {
 }
 interface LyricSearchParams extends CommonParams {
   name: string
-  interval?: number
   artist?: string
+  interval?: number
 }
-interface LyricSearchParams extends CommonParams {
+interface LyricSearchResult {
+  id: string
   name: string
   artist?: string
   interval?: number
+  lyric?: string
+}
+interface LyricDetailParams extends CommonParams {
+  id: string
 }
 interface PicSearchParams extends CommonParams {
   name: string
@@ -885,9 +890,10 @@ declare global {
       musicSearch: (params: SearchParams) => Promise<ListCommonResult<AnyListen.Music.MusicInfoOnline>>
       musicPic: (params: MusicCommonParams) => Promise<string>
       musicUrl: (params: MusicUrlParams) => Promise<MusicUrlInfo>
-      lyric: (params: MusicCommonParams) => Promise<AnyListen.Music.LyricInfo>
+      musicLyric: (params: MusicCommonParams) => Promise<AnyListen.Music.LyricInfo>
       musicPicSearch: (params: PicSearchParams) => Promise<string[]>
-      lyricSearch: (params: LyricSearchParams) => Promise<AnyListen.Music.LyricInfo[]>
+      lyricSearch: (params: LyricSearchParams) => Promise<LyricSearchResult[]>
+      lyricDetail: (params: LyricDetailParams) => Promise<AnyListen.Music.LyricInfo>
       // songlistSearch: (params: SearchParams) => Promise<ListCommonResult<AnyListen.Resource.SongListItem>>
       // songlistSorts: (params: CommonParams) => Promise<AnyListen.Resource.TagItem[]>
       // songlistTags: (params: CommonParams) => Promise<AnyListen.Resource.TagGroupItem[]>
