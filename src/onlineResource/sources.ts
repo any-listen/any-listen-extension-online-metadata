@@ -1,12 +1,13 @@
 import kw from './kw'
 import tx from './tx'
 import wy from './wy'
+import kg from './kg'
 
 export const sources = {
   kw,
   tx,
   wy,
-  kg: null,
+  kg,
   mg: null,
 } as const
 

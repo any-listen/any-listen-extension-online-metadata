@@ -45,6 +45,15 @@
           "musicPic",
           "musicLyric"
         ]
+      },
+      {
+        "id": "kg",
+        "name": "{kgName}",
+        "resource": [
+          "musicSearch",
+          "musicPic",
+          "musicLyric"
+        ]
       }
     ]
   },
