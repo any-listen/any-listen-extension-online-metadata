@@ -1,3 +1,4 @@
-First version
+### Feature
 
-Support matching tx, kw, wy online cover and lyrics
+- Add kg resource
+- Append image size parameter to wy image URL
