@@ -4,4 +4,5 @@ export const EXTENSION = {
   signFileName: 'sig',
   extBundleFileName: 'ext.tgz',
   enterFileName: 'main.js',
+  versionInfoName: 'version.json',
 }

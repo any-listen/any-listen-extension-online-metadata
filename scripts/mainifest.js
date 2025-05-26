@@ -7,9 +7,9 @@ import { EXTENSION } from './constants.js'
 export const createMainifest = async () => {
   const mainifest = {
     id: pkg.name,
-    name: '{displayName}',
+    name: pkg.displayName,
     description: '{description}',
-    icon: './resources/icon.png',
+    icon: pkg.icon,
     version: pkg.version,
     targetEngine: pkg.targetEngine,
     author: pkg.author,
