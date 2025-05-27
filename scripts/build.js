@@ -4,13 +4,11 @@ import { build } from './utils.js'
 import { createMainifest } from './mainifest.js'
 import { pack } from './pack.js'
 import { cpResources } from './cpResources.js'
-import { createVersionInfo } from './createVersionInfo.js'
 
 const run = async () => {
   await build(appConfig, () => {})
   await Promise.all([cpResources(), createMainifest()])
   await pack()
-  await createVersionInfo()
 }
 
 run()
