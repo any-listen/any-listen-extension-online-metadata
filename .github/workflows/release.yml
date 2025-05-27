@@ -58,7 +58,7 @@ jobs:
           tag_name: v${{ env.PACKAGE_VERSION }}
           files: |
             ./build/${{ env.PACKAGE_NAME }}
-            ./build/${{ env.VERSION_NAME }}
+            ./publish/${{ env.VERSION_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
