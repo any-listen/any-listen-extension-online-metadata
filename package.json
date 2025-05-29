@@ -17,7 +17,7 @@
   "author": "",
   "download_url_template": "https://github.com/any-listen/any-listen-extension-online-metadata/releases/download/v{version}",
   "targetEngine": "1.0.0",
-  "icon": "./resources/icon.svg",
+  "icon": "./resources/icon.png",
   "grant": [
     "internet"
   ],

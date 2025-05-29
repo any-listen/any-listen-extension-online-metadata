@@ -1,3 +1,3 @@
 ### Feature
 
-- Support extension store
+- Update icon
