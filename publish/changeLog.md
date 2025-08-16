@@ -1,3 +1,3 @@
-### Feature
+### Fix
 
-- Update icon
+- fix kg music info parse
