@@ -1,5 +1,3 @@
-// import type { ExtensionAPIEventType } from '@/event'
-
 declare namespace AnyListen {
   interface IPCActionBase<A> {
     action: A
@@ -175,7 +173,7 @@ declare namespace AnyListen {
       desc: string
     }
     type ParentId = string | null
-    type UserListInfoByGeneralMeta = UserListInfoBaseMeta
+    interface UserListInfoByGeneralMeta extends UserListInfoBaseMeta {}
     interface UserListInfoByLocalMeta extends UserListInfoBaseMeta {
       deviceId: string
       path: string
@@ -464,12 +462,14 @@ declare namespace AnyListen {
     interface PlayerActionSet {
       listId: string | null
       list: Player.PlayMusicInfo[]
+      isOnline: boolean
+      isSync?: boolean
     }
     interface PlayerActionAdd {
       musics: Player.PlayMusicInfo[]
       pos: number
     }
-    type PlayerActionUpdate = Player.PlayMusicInfo
+    type PlayerActionUpdate = Player.PlayMusicInfo[]
     type PlayerActionRemove = string[]
     type PlayerActionPlayed = string[]
     type PlayerActionUnplayed = string[]
@@ -728,20 +728,46 @@ declare global {
       buttons?: MessageButton[]
     }
 
-    interface InputDialogOptions {
-      signal?: unknown
+    interface FormItemBase<V> {
+      /** An optional string that represents the title of the form. */
+      title?: string
+      /** The text to display underneath the form. */
+      description?: string
+      /** The value to pre-fill in the form. */
+      value?: V
+    }
+    interface InputOptions extends FormItemBase<string> {
+      type: 'input'
       /** Controls if a password input is shown. Password input hides the typed text. */
       password?: boolean
       /** An optional string to show as placeholder in the input box to guide the user what to type. */
       placeHolder?: string
-      /** The text to display underneath the input box. */
-      prompt?: string
-      /** An optional string that represents the title of the input box. */
+    }
+    interface BoolOptions extends FormItemBase<boolean> {
+      type: 'boolean'
+    }
+    interface EnumItem<T> {
+      name: string
+      value: T
+    }
+    interface RadioOptions<T extends string | number = string> extends FormItemBase<T> {
+      type: 'radio'
+      enum?: Array<EnumItem<T>>
+    }
+    interface SelectionOptions<T extends string | number = string> extends FormItemBase<T> {
+      type: 'selection'
+      enum: Array<EnumItem<T>>
+    }
+    interface FormDialogOptions {
+      signal?: unknown
+      /** An optional string that represents the title of the form dialog. */
       title?: string
-      /** The value to pre-fill in the input box. */
-      value?: string
+      /** An optional string that represents the description of the form dialog. */
+      description?: string
+      /** The form items */
+      items: Array<InputOptions | BoolOptions | RadioOptions | SelectionOptions>
       /** An optional function that will be called to validate input and to give a hint to the user. */
-      validateInput?: (value: string) => null | undefined | string
+      validateInput?: (index: number, value: string) => null | undefined | string
     }
 
     interface OpenDialogOptions {
@@ -818,11 +844,15 @@ declare global {
       readonly publicKey: string
       /** 扩展版本号 */
       readonly extensionVersion: string
+
+      readonly onLocaleChanged: (callback: (locale: Locale) => void) => () => void
     }
     /** 应用相关 */
     interface App {
       showMessage: (message: string, options?: MessageDialogOptions) => Promise<number | undefined>
-      showInput: (options: InputDialogOptions) => Promise<string | undefined>
+      // TODO
+      showFormDialog: (options: FormDialogOptions) => Promise<string | undefined>
+      // showInput: (options: InputDialogOptions) => Promise<string | undefined>
       showOpenDialog: (options: OpenDialogOptions) => Promise<string | string[] | undefined>
       showSaveDialog: (options: SaveDialogOptions) => Promise<string | undefined>
       // getConnectedClient: () => Promise<string[]>
@@ -831,6 +861,7 @@ declare global {
       getAllUserLists: () => Promise<AnyListen.List.MyAllList>
       getListMusics: (listId: string) => Promise<AnyListen.Music.MusicInfo[]>
       listAction: (action: AnyListen.IPCList.ActionList) => Promise<void>
+      onListAction: (handler: (action: AnyListen.IPCList.ActionList) => unknown) => () => void
     }
     interface PlayInfo {
       info: {
@@ -877,6 +908,9 @@ declare global {
       playListAction: (action: AnyListen.IPCPlayer.PlayListAction) => Promise<void>
       playerAction: (action: AnyListen.IPCPlayer.ActionPlayer) => Promise<void>
       playHistoryListAction: (action: AnyListen.IPCPlayer.PlayHistoryListAction) => Promise<void>
+      onPlayerEvent: (callback: (event: AnyListen.IPCPlayer.PlayerEvent) => unknown) => () => void
+      onPlayListEvent: (callback: (action: AnyListen.IPCPlayer.PlayListAction) => unknown) => () => void
+      onPlayHistoryEvent: (callback: (action: AnyListen.IPCPlayer.PlayHistoryListAction) => unknown) => () => void
     }
     interface MusicUrlInfo {
       url: string
@@ -903,6 +937,15 @@ declare global {
       // leaderboardDate: (params: SonglistListParams) => Promise<ListCommonResult<Music.MusicInfoOnline>>
       // leaderboardDetail: (params: SonglistListParams) => Promise<ListCommonResult<Music.MusicInfoOnline>>
     }
+
+    interface BackupDataAction {
+      getListMD5: () => Promise<string | null>
+      getListData: () => Promise<string | null>
+      setListData: (data: string, md5: string) => Promise<void>
+      getDislikeMD5: () => Promise<string | null>
+      getDislikeData: () => Promise<string | null>
+      setDislikeData: (data: string, md5: string) => Promise<void>
+    }
     interface Logcat {
       debug: (...args: unknown[]) => void
       info: (...args: unknown[]) => void
@@ -924,7 +967,7 @@ declare global {
     }
     interface Crypto {
       aesEncrypt: (mode: AES_MODE, data: Uint8Array | string, key: Uint8Array | string, iv: Uint8Array | string) => string
-      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array | string, key: Uint8Array | string) => string
+      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array, key: Uint8Array) => string
       randomBytes: (size: number) => Uint8Array
       md5: (b64Data: string) => string
     }
@@ -935,14 +978,13 @@ declare global {
     interface Configuration {
       getConfigs: (key: string[]) => Promise<string[]>
       setConfigs: (datas: Array<[string, string]>) => Promise<void>
+      onConfigChanged: (callback: (keys: string[], configuration: Record<string, unknown>) => void) => () => void
     }
     interface API {
       env: Env
       app: App
       musicList: MusicList
       player: Player
-      /** 事件 */
-      onEvent: ExtensionAPIEventType['on']
       /** http 请求 */
       request: <Resp = unknown>(url: string, options?: RequestOptions) => Promise<Response<Resp>>
       t: (key: string, data?: Record<string, string | number | null | undefined>) => string
@@ -950,6 +992,11 @@ declare global {
       storage: Storage
       configuration: Configuration
       registerResourceAction: (actions: Partial<ResourceAction>) => void
+      // TODO
+      backup: {
+        runBackup: (opts: { backupData?: Array<'list' | 'dislike'> }) => Promise<void>
+        registerDataAction: (actions: BackupDataAction) => void
+      }
       utils: {
         buffer: Buffer
         crypto: Crypto
