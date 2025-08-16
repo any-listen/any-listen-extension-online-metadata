@@ -64,7 +64,7 @@ export interface List {
   IsOriginal: number
   FileHash: string
   FoldType: number
-  Grp: Grp[]
+  Grp?: Grp[]
   ID: string
   MvTrac: number
   isPrepublish: number
