@@ -1,3 +1,3 @@
 ### Fix
 
-- fix kg music info parse
+- fix tx music search
