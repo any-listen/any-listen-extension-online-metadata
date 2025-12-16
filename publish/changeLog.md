@@ -1,3 +1,3 @@
 ### Fix
 
-- fix tx music search
+- fix kw music pic url
