@@ -11,7 +11,7 @@ export const createMainifest = async () => {
     description: '{description}',
     icon: pkg.icon,
     version: pkg.version,
-    targetEngine: pkg.targetEngine,
+    target_engine: pkg.targetEngine,
     author: pkg.author,
     homepage: pkg.homepage,
     license: pkg.license,
