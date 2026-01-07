@@ -1,7 +1,5 @@
 {
   "name": "online-metadata",
-  "displayName": "Online Metadata",
-  "private": true,
   "version": "0.2.6",
   "type": "module",
   "scripts": {
@@ -12,55 +10,8 @@
   },
   "homepage": "https://github.com/any-listen/any-listen-extension-online-metadata#readme",
   "license": "Apache-2.0",
-  "categories": [],
-  "tags": [],
   "author": "",
   "download_url_template": "https://github.com/any-listen/any-listen-extension-online-metadata/releases/download/v{version}",
-  "targetEngine": "1.0.0",
-  "icon": "./resources/icon.png",
-  "grant": [
-    "internet"
-  ],
-  "contributes": {
-    "resource": [
-      {
-        "id": "kw",
-        "name": "{kwName}",
-        "resource": [
-          "musicSearch",
-          "musicPic",
-          "musicLyric"
-        ]
-      },
-      {
-        "id": "tx",
-        "name": "{txName}",
-        "resource": [
-          "musicSearch",
-          "musicPic",
-          "musicLyric"
-        ]
-      },
-      {
-        "id": "wy",
-        "name": "{wyName}",
-        "resource": [
-          "musicSearch",
-          "musicPic",
-          "musicLyric"
-        ]
-      },
-      {
-        "id": "kg",
-        "name": "{kgName}",
-        "resource": [
-          "musicSearch",
-          "musicPic",
-          "musicLyric"
-        ]
-      }
-    ]
-  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/he": "^1.2.3",

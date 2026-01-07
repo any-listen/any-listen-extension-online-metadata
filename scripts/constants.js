@@ -3,6 +3,6 @@ export const EXTENSION = {
   mainifestName: 'manifest.json',
   signFileName: 'sig',
   extBundleFileName: 'ext.tgz',
-  enterFileName: 'main.js',
+  entryFileName: 'main.js',
   versionInfoName: 'version.json',
 }

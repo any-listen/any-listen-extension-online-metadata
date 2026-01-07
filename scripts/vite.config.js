@@ -29,7 +29,7 @@ export default defineConfig({
     rollupOptions: {
       input: path.join(projectPath, 'index.ts'),
       output: {
-        entryFileNames: EXTENSION.enterFileName,
+        entryFileNames: EXTENSION.entryFileName,
         format: 'esm',
         experimentalMinChunkSize: 50_000,
       },

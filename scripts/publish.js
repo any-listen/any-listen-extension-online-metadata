@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { buildPakageName } from './utils.js'
-import pkg from '../package.json' with { type: 'json' }
+import config from '../config.ts'
 
 export const run = async () => {
   const filePath = path.join(import.meta.dirname, '../publish/version.json')
@@ -10,8 +10,8 @@ export const run = async () => {
     .then((d) => JSON.parse(d.toString()))
     .catch(() => ({}))
   if (versionInfo.version) {
-    if (versionInfo.version === pkg.version) {
-      console.warn(`Version (v${pkg.version}) already published`)
+    if (versionInfo.version === config.version) {
+      console.warn(`Version (v${config.version}) already published`)
       process.exit(1)
     }
     versionInfo.history ||= []
@@ -22,8 +22,8 @@ export const run = async () => {
       date: versionInfo.date,
     })
   }
-  versionInfo.version = pkg.version
-  versionInfo.download_url = `${pkg.download_url_template.replaceAll('{version}', pkg.version)}/${buildPakageName()}`
+  versionInfo.version = config.version
+  versionInfo.download_url = `${config.download_url_template.replaceAll('{version}', config.version)}/${buildPakageName()}`
   versionInfo.log = await fs.promises
     .readFile(path.join(import.meta.dirname, '../publish/changeLog.md'), 'utf-8')
     .then((d) => d.toString().trim())

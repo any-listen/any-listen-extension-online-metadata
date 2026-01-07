@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { build as viteBuild, mergeConfig } from 'vite'
-import pkg from '../package.json' with { type: 'json' }
+import config from '../config.ts'
 import { EXTENSION } from './constants.js'
 
 export const getSourceDir = () => {
@@ -10,7 +10,7 @@ export const getOutDir = () => {
   return path.join(import.meta.dirname, '../build')
 }
 export const buildPakageName = () => {
-  return `${pkg.name}_v${pkg.version}.${EXTENSION.pkgExtName}`
+  return `${config.name}_v${config.version}.${EXTENSION.pkgExtName}`
 }
 
 /**

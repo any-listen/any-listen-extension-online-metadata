@@ -11,7 +11,9 @@
     "composite": true,
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
     "types": ["@types/node"]
   },
-  "include": ["scripts/**/*.js", "package.json"]
+  "include": ["scripts/**/*.js", "package.json", "package.json", "config.ts"]
 }

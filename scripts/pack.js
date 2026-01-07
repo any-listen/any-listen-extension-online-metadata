@@ -60,7 +60,7 @@ export const pack = async () => {
   await packFile({
     gzip: true,
     cwd: sourceDir,
-    files: [EXTENSION.enterFileName, EXTENSION.mainifestName, 'resources', 'i18n'],
+    files: [EXTENSION.entryFileName, EXTENSION.mainifestName, 'resources', 'i18n'],
     dist: extBundleFilePath,
   })
   const buf = await fs.promises.readFile(extBundleFilePath)
