@@ -4,7 +4,7 @@ import { Sources, sources } from './sources'
 export const initOnlineResource = () => {
   registerResourceAction({
     async musicSearch(params) {
-      const musics = await sources[params.source as Sources]!.musicSearch(
+      const musics = await sources[params.source as Sources].musicSearch(
         `${params.name} ${params.artist || ''}`.trim(),
         params.page,
         params.limit
@@ -17,12 +17,12 @@ export const initOnlineResource = () => {
       }
     },
     async musicPic(params) {
-      const pic = await sources[params.source as Sources]!.getPic(params.musicInfo)
+      const pic = await sources[params.source as Sources].getPic(params.musicInfo)
       if (!pic) throw new Error(t('onlineResource.picNotFound'))
       return pic
     },
     async musicLyric(params) {
-      const lyric = await sources[params.source as Sources]!.getLyric(params.musicInfo)
+      const lyric = await sources[params.source as Sources].getLyric(params.musicInfo)
       return {
         name: params.musicInfo.name,
         singer: params.musicInfo.singer,

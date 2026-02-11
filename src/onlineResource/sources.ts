@@ -11,4 +11,4 @@ export const sources = {
   mg: null,
 } as const
 
-export type Sources = keyof typeof sources
+export type Sources = Exclude<keyof typeof sources, 'mg'>

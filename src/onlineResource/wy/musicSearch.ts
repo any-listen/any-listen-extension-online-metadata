@@ -1,7 +1,7 @@
 /* eslint-disable no-fallthrough */
 import { formatPlayTime, sizeFormate } from '@/shared/utils'
 import { eapiRequest } from './utils'
-import { Song, MusicSearch } from './types/musicSearch'
+import { Resource, MusicSearch } from './types/musicSearch'
 import { formatSingerName } from '../shared'
 
 const pageInfo = {
@@ -12,20 +12,30 @@ const pageInfo = {
 }
 
 const musicSearch = async (str: string, page: number, limit: number) => {
-  const { body } = await eapiRequest<MusicSearch>('/api/cloudsearch/pc', {
-    s: str,
-    type: 1, // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
-    limit,
-    total: page == 1,
+  // const { body } = await eapiRequest<MusicSearch>('/api/cloudsearch/pc', {
+  //   s: str,
+  //   type: 1, // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
+  //   limit,
+  //   total: page == 1,
+  //   offset: limit * (page - 1),
+  // })
+  const { body } = await eapiRequest<MusicSearch>('/api/search/song/list/page', {
+    keyword: str,
+    needCorrect: '1',
+    channel: 'typing',
     offset: limit * (page - 1),
+    scene: 'normal',
+    total: page == 1,
+    limit,
   })
   return body
 }
 
-const handleResult = (rawList: Song[]): AnyListen_API.MusicInfoOnline[] => {
+const handleResult = (rawList: Resource[]): AnyListen_API.MusicInfoOnline[] => {
   // console.log(rawList)
   if (!rawList) return []
-  return rawList.map((item) => {
+  return rawList.map((_item) => {
+    const item = _item.baseInfo.simpleSongData
     const types: AnyListen_API.MusicInfoOnline['meta']['qualitys'] = {}
     let size
 
@@ -80,11 +90,11 @@ export const search = async (str: string, page = 1, limit?: number): Promise<Any
   return musicSearch(str, page, limit).then((result) => {
     // console.log(result)
     if (!result || result.code !== 200) throw new Error('search error')
-    const list = handleResult(result.result.songs || [])
+    const list = handleResult(result.data.resources || [])
     // console.log(list)
     if (list == null) throw new Error('search error')
 
-    pageInfo.total = result.result.songCount || 0
+    pageInfo.total = result.data.totalCount || 0
     pageInfo.page = page
     pageInfo.allPage = Math.ceil(pageInfo.total / pageInfo.limit)
 

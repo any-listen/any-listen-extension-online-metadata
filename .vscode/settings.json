@@ -6,7 +6,7 @@
     "source.fixAll.stylelint": "explicit",
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": ["svelte", "javascript", "typescript"],
+  "eslint.validate": ["javascript", "typescript"],
   "i18n-ally.localesPaths": ["i18n"],
   // "i18n-ally.fullReloadOnChanged": true,
   "i18n-ally.keystyle": "flat",

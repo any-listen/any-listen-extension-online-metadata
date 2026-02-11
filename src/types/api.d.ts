@@ -967,7 +967,7 @@ declare global {
     }
     interface Crypto {
       aesEncrypt: (mode: AES_MODE, data: Uint8Array | string, key: Uint8Array | string, iv: Uint8Array | string) => string
-      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array, key: Uint8Array) => string
+      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array, key: Uint8Array | string) => string
       randomBytes: (size: number) => Uint8Array
       md5: (b64Data: string) => string
     }
