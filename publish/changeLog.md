@@ -1,3 +1,3 @@
 ### Fix
 
-- fix kw music pic url
+- fix wy music search
