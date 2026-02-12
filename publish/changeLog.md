@@ -1,3 +1,3 @@
-### Fix
+### Fixed
 
-- fix wy music search
+- fix publish name

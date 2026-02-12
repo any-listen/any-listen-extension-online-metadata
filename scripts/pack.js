@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { c } from 'tar'
-import { buildPakageName, getOutDir, getSourceDir } from './utils.js'
+import { buildPackageName, getOutDir, getSourceDir } from './utils.js'
 import { EXTENSION } from './constants.js'
 import crypto from 'crypto'
 
@@ -73,6 +73,6 @@ export const pack = async () => {
     gzip: true,
     cwd: unpackedDir,
     files: [EXTENSION.extBundleFileName, EXTENSION.signFileName],
-    dist: path.join(getOutDir(), buildPakageName()),
+    dist: path.join(getOutDir(), buildPackageName()),
   })
 }

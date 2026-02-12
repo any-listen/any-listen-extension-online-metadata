@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { buildPakageName } from './utils.js'
+import { buildPackageName } from './utils.js'
 import config from '../config.ts'
 
 export const run = async () => {
@@ -23,7 +23,7 @@ export const run = async () => {
     })
   }
   versionInfo.version = config.version
-  versionInfo.download_url = `${config.download_url_template.replaceAll('{version}', config.version)}/${buildPakageName()}`
+  versionInfo.download_url = `${config.download_url_template.replaceAll('{version}', config.version)}/${buildPackageName()}`
   versionInfo.log = await fs.promises
     .readFile(path.join(import.meta.dirname, '../publish/changeLog.md'), 'utf-8')
     .then((d) => d.toString().trim())

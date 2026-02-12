@@ -9,8 +9,8 @@ export const getSourceDir = () => {
 export const getOutDir = () => {
   return path.join(import.meta.dirname, '../build')
 }
-export const buildPakageName = () => {
-  return `${config.name}_v${config.version}.${EXTENSION.pkgExtName}`
+export const buildPackageName = () => {
+  return `${config.id}_v${config.version}.${EXTENSION.pkgExtName}`
 }
 
 /**
