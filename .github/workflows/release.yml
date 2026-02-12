@@ -37,7 +37,7 @@ jobs:
       - name: Get package info
         run: |
           node -p '`PACKAGE_VERSION=${require("./package.json").version}`' >> $GITHUB_ENV
-          node -p '`PACKAGE_NAME=${require("./scripts/utils.js").buildPakageName()}`' >> $GITHUB_ENV
+          node -p '`PACKAGE_NAME=${require("./scripts/utils.js").buildPackageName()}`' >> $GITHUB_ENV
           node -p '`VERSION_NAME=${require("./scripts/constants.js").EXTENSION.versionInfoName}`' >> $GITHUB_ENV
 
       - name: Create git tag
