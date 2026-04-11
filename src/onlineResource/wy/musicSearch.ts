@@ -42,25 +42,25 @@ const handleResult = (rawList: Resource[]): AnyListen_API.MusicInfoOnline[] => {
     if (item.privilege.maxBrLevel == 'hires') {
       size = item.hr ? sizeFormate(item.hr.size) : null
       types.flac24bit = {
-        size,
+        sizeStr: size,
       }
     }
     switch (item.privilege.maxbr) {
       case 999000:
         size = item.sq ? sizeFormate(item.sq.size) : null
         types.flac = {
-          size,
+          sizeStr: size,
         }
       case 320000:
         size = item.h ? sizeFormate(item.h.size) : null
         types['320k'] = {
-          size,
+          sizeStr: size,
         }
       case 192000:
       case 128000:
         size = item.l ? sizeFormate(item.l.size) : null
         types['128k'] = {
-          size,
+          sizeStr: size,
         }
     }
 

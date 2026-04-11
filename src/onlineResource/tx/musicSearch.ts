@@ -82,25 +82,25 @@ const handleResult = (rawList: ItemSong[]) => {
     if (file.size_128mp3 != 0) {
       const size = sizeFormate(file.size_128mp3)
       types['128k'] = {
-        size,
+        sizeStr: size,
       }
     }
     if (file.size_320mp3 !== 0) {
       const size = sizeFormate(file.size_320mp3)
       types['320k'] = {
-        size,
+        sizeStr: size,
       }
     }
     if (file.size_flac !== 0) {
       const size = sizeFormate(file.size_flac)
       types.flac = {
-        size,
+        sizeStr: size,
       }
     }
     if (file.size_hires !== 0) {
       const size = sizeFormate(file.size_hires)
       types.flac24bit = {
-        size,
+        sizeStr: size,
       }
     }
     // types.reverse()

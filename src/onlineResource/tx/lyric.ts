@@ -19,8 +19,8 @@ export const getLyric = async ({ meta }: AnyListen_API.MusicInfo) => {
   if (body.code != 0 || !body.lyric) return Promise.reject(new Error('Get lyric failed'))
   console.log('tx lyric:', songmid)
   return {
-    lyric: decodeName(b64DecodeUnicode(body.lyric)),
-    tlyric: decodeName(b64DecodeUnicode(body.trans)),
+    lyric: decodeName(await b64DecodeUnicode(body.lyric)),
+    tlyric: decodeName(await b64DecodeUnicode(body.trans)),
     awlyric: null,
     rlyric: null,
   }

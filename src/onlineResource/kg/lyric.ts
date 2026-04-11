@@ -1,4 +1,4 @@
-import { buffer, console, request } from '@/shared/hostApi'
+import { console, dataConverter, request } from '@/shared/hostApi'
 import { Lyric, LyricLangs, LyricSearch } from './types/lyric'
 import { decodeKrc } from './utils'
 import { decodeName } from '@/shared/utils'
@@ -22,7 +22,7 @@ const searchLyric = async (name: string, hash: string, time: number) => {
 }
 
 const headExp = /^.*\[id:\$\w+\]\n/
-const parseLyric = (str: string) => {
+const parseLyric = async (str: string) => {
   str = str.replace(/\r/g, '')
   if (headExp.test(str)) str = str.replace(headExp, '')
   const trans = str.match(/\[language:([\w=\\/+]+)\]/)
@@ -32,7 +32,7 @@ const parseLyric = (str: string) => {
   const tlyric: string[] = []
   if (trans) {
     str = str.replace(/\[language:[\w=\\/+]+\]\n/, '')
-    const json = JSON.parse(buffer.bufToString(buffer.from(trans[1], 'base64'), 'utf8')) as LyricLangs
+    const json = JSON.parse(await dataConverter(trans[1], 'base64', 'utf-8')) as LyricLangs
     for (const item of json.content) {
       switch (item.type) {
         case 0:
@@ -92,7 +92,7 @@ const getLyricDownload = async (id: string, accessKey: string, fmt: string) => {
       return parseLyric(await decodeKrc(body.content))
     case 'lrc':
       return {
-        lyric: buffer.bufToString(buffer.from(body.content, 'base64'), 'utf8'),
+        lyric: await dataConverter(body.content, 'base64', 'utf-8'),
         tlyric: '',
         rlyric: '',
         awlyric: '',

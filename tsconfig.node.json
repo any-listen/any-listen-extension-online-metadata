@@ -7,7 +7,6 @@
     "skipLibCheck": false,
     "module": "ESNext",
     "checkJs": true,
-    "moduleResolution": "Node",
     "composite": true,
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,

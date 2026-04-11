@@ -41,22 +41,22 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
         switch (result[2]) {
           case '4000':
             types.flac24bit = {
-              size: result[4].toLocaleUpperCase(),
+              sizeStr: result[4].toLocaleUpperCase(),
             }
             break
           case '2000':
             types.flac = {
-              size: result[4].toLocaleUpperCase(),
+              sizeStr: result[4].toLocaleUpperCase(),
             }
             break
           case '320':
             types['320k'] = {
-              size: result[4].toLocaleUpperCase(),
+              sizeStr: result[4].toLocaleUpperCase(),
             }
             break
           case '128':
             types['128k'] = {
-              size: result[4].toLocaleUpperCase(),
+              sizeStr: result[4].toLocaleUpperCase(),
             }
             break
         }

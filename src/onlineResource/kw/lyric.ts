@@ -1,14 +1,14 @@
-import { buffer, console, request } from '@/shared/hostApi'
+import { console, dataConverter, request } from '@/shared/hostApi'
 import { lrcTools } from './util'
 import decodeLyric from './decodeLyric'
 import { decodeName } from '@/shared/utils'
 
-const buf_key = buffer.from('yeelion')
+const buf_key = new Uint8Array([121, 101, 101, 108, 105, 111, 110])
 const buf_key_len = buf_key.length
-const buildParams = (id: string, isGetLyricx: boolean) => {
+const buildParams = async (id: string, isGetLyricx: boolean) => {
   let params = `user=12345,web,web,web&requester=localhost&req=1&rid=MUSIC_${id}`
   if (isGetLyricx) params += '&lrcx=1'
-  const buf_str = buffer.from(params)
+  const buf_str = await dataConverter(params)
   const buf_str_len = buf_str.length
   const output = new Uint16Array(buf_str_len)
   let i = 0
@@ -20,7 +20,7 @@ const buildParams = (id: string, isGetLyricx: boolean) => {
       j++
     }
   }
-  return buffer.bufToString(new Uint8Array(output), 'base64')
+  return dataConverter(new Uint8Array(output), 'base64')
 }
 
 // console.log(buildParams('207527604', false))
@@ -101,7 +101,7 @@ const parseLrc = (lrc: string) => {
 }
 export const getLyric = async (musicInfo: AnyListen_API.MusicInfo, isGetLyricx = true) => {
   // getLyric2(musicInfo)
-  const resp = await request<string>(`http://newlyric.kuwo.cn/newlyric.lrc?${buildParams(musicInfo.id, isGetLyricx)}`, {
+  const resp = await request<string>(`http://newlyric.kuwo.cn/newlyric.lrc?${await buildParams(musicInfo.id, isGetLyricx)}`, {
     needRaw: true,
   })
   if (resp.statusCode != 200) throw new Error(JSON.stringify(resp.body))

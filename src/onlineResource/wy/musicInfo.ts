@@ -11,7 +11,7 @@ export const getMusicInfo = async ({ meta }: AnyListen_API.MusicInfo) => {
       Referer: 'https://music.163.com/song?id=' + meta.musicId,
       origin: 'https://music.163.com',
     },
-    form: weapi({
+    form: await weapi({
       c: `[{"id":${meta.musicId}}]`,
       ids: `[${meta.musicId}]`,
     }),

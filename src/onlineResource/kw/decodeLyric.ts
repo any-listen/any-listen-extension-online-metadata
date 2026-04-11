@@ -1,5 +1,5 @@
 import { inflate } from 'pako'
-import { buffer, iconv } from '@/shared/hostApi'
+import { dataConverter, iconv } from '@/shared/hostApi'
 
 function uint8IndexOfSequence(uint8Array: Uint8Array, sequence: Uint8Array) {
   const seqLen = sequence.length
@@ -25,17 +25,17 @@ const handleInflate = (data: Uint8Array) => {
   })
 }
 
-const buf_key = buffer.from('yeelion')
-const delimiter = buffer.from('\r\n\r\n')
+const buf_key = new Uint8Array([121, 101, 101, 108, 105, 111, 110])
+const delimiter = new Uint8Array([13, 10, 13, 10])
 const buf_key_len = buf_key.length
 
 const decodeLyric = async (buf: Uint8Array, isGetLyricx: boolean) => {
-  if (buffer.bufToString(buf.slice(0, 10), 'utf8') != 'tp=content') return ''
+  if ((await dataConverter(buf.slice(0, 10), 'utf-8')) != 'tp=content') return ''
   const lrcData = await handleInflate(buf.subarray(uint8IndexOfSequence(buf, delimiter) + 4))
 
   if (!isGetLyricx) return iconv.decode(lrcData, 'gb18030')
 
-  const buf_str = buffer.from(buffer.bufToString(lrcData, 'utf8'), 'base64')
+  const buf_str = await dataConverter(await dataConverter(lrcData, 'utf-8'), 'base64')
   const buf_str_len = buf_str.length
   const output = new Uint16Array(buf_str_len)
   let i = 0

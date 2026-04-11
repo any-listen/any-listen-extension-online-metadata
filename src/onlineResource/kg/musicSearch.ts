@@ -21,30 +21,30 @@ const musicSearch = async (str: string, page: number, limit: number) => {
 const filterData = (rawData: List | Grp): AnyListen_API.MusicInfoOnline => {
   const types: AnyListen_API.MusicInfoOnline['meta']['qualitys'] = {}
   if (rawData.FileSize !== 0) {
-    const size = sizeFormate(rawData.FileSize)
+    const sizeStr = sizeFormate(rawData.FileSize)
     types['128k'] = {
-      size,
+      sizeStr,
       hash: rawData.FileHash,
     }
   }
   if (rawData.HQFileSize !== 0) {
-    const size = sizeFormate(rawData.HQFileSize)
+    const sizeStr = sizeFormate(rawData.HQFileSize)
     types['320k'] = {
-      size,
+      sizeStr,
       hash: rawData.HQFileHash,
     }
   }
   if (rawData.SQFileSize !== 0) {
-    const size = sizeFormate(rawData.SQFileSize)
+    const sizeStr = sizeFormate(rawData.SQFileSize)
     types.flac = {
-      size,
+      sizeStr,
       hash: rawData.SQFileHash,
     }
   }
   if (rawData.ResFileSize !== 0) {
-    const size = sizeFormate(rawData.ResFileSize)
+    const sizeStr = sizeFormate(rawData.ResFileSize)
     types.flac24bit = {
-      size,
+      sizeStr,
       hash: rawData.ResFileHash,
     }
   }

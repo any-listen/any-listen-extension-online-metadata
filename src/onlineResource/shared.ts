@@ -1,7 +1,7 @@
 import { crypto } from '@/shared/hostApi'
 import { decodeName } from '@/shared/utils'
 
-export const toMD5 = (str: string) => crypto.md5(str)
+export const toMD5 = async (str: string) => crypto.md5(str)
 
 /**
  * 格式化歌手

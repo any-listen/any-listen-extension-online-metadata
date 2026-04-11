@@ -1,3 +1,6 @@
+type WithUndefined<T extends readonly unknown[]> = {
+  [K in keyof T]: T[K] | undefined
+}
 declare namespace AnyListen {
   interface IPCActionBase<A> {
     action: A
@@ -89,9 +92,9 @@ declare namespace AnyListen {
 
     type MusicQualityType = Partial<
       Record<
-        Quality,
+        string,
         {
-          size: string | null
+          sizeStr: string | null
           [key: string]: string | null
         }
       >
@@ -109,15 +112,19 @@ declare namespace AnyListen {
 
     interface MusicInfoMeta_online extends MusicInfoMetaBase {
       source: Source // 源
-      qualitys: MusicQualityType
-      [key: string]: unknown
+      qualitys?: MusicQualityType
+      filePath?: string
+      ext?: string
+      bitrateLabel?: string | null
+      sizeStr?: string
+      [key: string]: string | number | boolean | null | undefined | object
     }
 
     interface MusicInfoMeta_local extends MusicInfoMetaBase {
       filePath: string
       ext: string
       bitrateLabel: string | null
-      size: string
+      sizeStr: string
     }
 
     interface MusicInfoBase<IsLocal extends boolean> {
@@ -166,6 +173,8 @@ declare namespace AnyListen {
   }
   namespace List {
     interface UserListInfoBaseMeta {
+      songCount: number
+      pic: string
       playCount: number
       createTime: number
       updateTime: number
@@ -177,17 +186,29 @@ declare namespace AnyListen {
     interface UserListInfoByLocalMeta extends UserListInfoBaseMeta {
       deviceId: string
       path: string
+      includeSubDir: boolean
+      enabledRemove?: boolean
+      usePolling?: boolean
     }
     interface UserListInfoByOnlineMeta extends UserListInfoBaseMeta {
+      extensionId: string
       source: string
       syncId: string
       syncTime: number
+      picUrl: string | null
+    }
+    interface UserListInfoByRemoteMeta extends UserListInfoBaseMeta {
+      extensionId: string
+      source: string
+      syncTime: number
+      [key: string]: unknown
     }
 
     interface UserListInfoMetas {
       general: UserListInfoByGeneralMeta
       local: UserListInfoByLocalMeta
       online: UserListInfoByOnlineMeta
+      remote: UserListInfoByRemoteMeta
     }
     interface UserListInfoType<Type extends keyof UserListInfoMetas> {
       id: string
@@ -199,23 +220,27 @@ declare namespace AnyListen {
 
     type UserListType = keyof UserListInfoMetas
 
-    type UserListInfo = UserListInfoType<'general'> | UserListInfoType<'local'> | UserListInfoType<'online'>
+    type GeneralListInfo = UserListInfoType<'general'>
+    type LocalListInfo = UserListInfoType<'local'>
+    type OnlineListInfo = UserListInfoType<'online'>
+    type RemoteListInfo = UserListInfoType<'remote'>
+    type UserListInfo = GeneralListInfo | LocalListInfo | OnlineListInfo | RemoteListInfo
 
-    interface MyDefaultListInfo extends Omit<UserListInfoType<'general'>, 'type'> {
+    interface MyDefaultListInfo extends Omit<GeneralListInfo, 'type'> {
       id: 'default'
-      name: 'default'
+      name: string
       type: 'default'
     }
 
-    interface MyLoveListInfo extends Omit<UserListInfoType<'general'>, 'type'> {
+    interface MyLoveListInfo extends Omit<GeneralListInfo, 'type'> {
       id: 'love'
-      name: 'love'
+      name: string
       type: 'default'
     }
 
-    interface MyLastPlayListInfo extends Omit<UserListInfoType<'general'>, 'type'> {
+    interface MyLastPlayListInfo extends Omit<GeneralListInfo, 'type'> {
       id: 'last_played'
-      name: 'last_played'
+      name: string
       type: 'default'
     }
 
@@ -338,7 +363,10 @@ declare namespace AnyListen {
       listInfos: List.UserListInfo[]
     }
     type ListActionRemove = string[]
-    type ListActionUpdate = List.UserListInfo[]
+    interface ListActionUpdate {
+      lists: List.MyListInfo[]
+      sync?: boolean
+    }
     interface ListActionMove {
       /**
        * 目标列表id
@@ -395,6 +423,7 @@ declare namespace AnyListen {
     interface ListActionMusicRemove {
       listId: string
       ids: string[]
+      sync?: boolean
     }
 
     type ListActionMusicUpdate = Array<{
@@ -507,18 +536,19 @@ declare namespace AnyListen {
       maxPlayTimeStr: string
     }
 
-    type PlayerStatus = 'playing' | 'paused' | 'stoped' | 'loading' | 'buffering' | 'ended' | 'error'
+    type PlayerStatus = 'playing' | 'paused' | 'stopped' | 'loading' | 'buffering' | 'ended' | 'error'
 
     /** 播放器实时状态 / 用户期望的播放状态 */
     type Status = [PlayerStatus, boolean]
     type PlayerEvent =
-      | IPCAction<'musicChanged', { index: number; historyIndex: number }>
-      | IPCAction<'musicInfoUpdated', Player.MusicInfo>
-      | IPCAction<'playInfoUpdated', Player.PlayInfo>
+      | IPCAction<'musicChanged', { index: number; historyIndex: number; lastTrackId?: string | null }>
+      | IPCAction<'musicInfoUpdated', Partial<Player.MusicInfo>>
+      | IPCAction<'playInfoUpdated', Partial<Player.PlayInfo>>
       | IPCAction<'progress', Progress>
       | IPCAction<'playbackRate', number>
       | IPCAction<'status', Status>
       | IPCAction<'statusText', string>
+      | IPCAction<'lyricText', string>
       | IPCAction<'picUpdated', string | null>
       | IPCAction<'lyricUpdated', Music.LyricInfo>
       | IPCAction<'lyricOffsetUpdated', number>
@@ -584,7 +614,7 @@ interface SonglistListParams extends CommonListParams {
   sort: string
   tag: string
 }
-interface ListCommonResult<T> {
+export interface ListCommonResult<T> {
   list: T[]
   total: number
   page: number
@@ -595,12 +625,12 @@ interface MusicCommonParams extends CommonParams {
   musicInfo: AnyListen.Music.MusicInfoOnline
 }
 interface MusicUrlParams extends MusicCommonParams {
-  quality?: AnyListen.Music.Quality
+  quality?: string
   type?: AnyListen.Music.FileType
 }
 interface MusicUrlInfo {
   url: string
-  quality: AnyListen.Music.Quality
+  quality: string
 }
 
 interface SongListItem {
@@ -629,9 +659,6 @@ type BoardItem = CommonItem
 
 declare global {
   namespace AnyListen_API {
-    type MusicInfo = AnyListen.Music.MusicInfo
-    type MusicInfoOnline = AnyListen.Music.MusicInfoOnline
-    type MusicLyricInfo = AnyListen.Music.LyricInfo
     type Locale =
       | 'ar-sa'
       | 'cs-cz'
@@ -675,6 +702,8 @@ declare global {
     type Architecture = 'arm' | 'arm64' | 'x86' | 'x64'
     type ClientType = 'desktop' | 'web' | 'mobile'
     type Quality = '128k' | '320k' | 'flac' | 'flac24bit' | '192k' | 'wav' | 'dobly' | 'master'
+    type MusicInfo = AnyListen.Music.MusicInfo
+    type MusicInfoOnline = AnyListen.Music.MusicInfoOnline
 
     type ParamsData = Record<string, string | number | null | undefined | boolean>
     interface RequestOptions {
@@ -683,7 +712,8 @@ declare global {
       headers?: Record<string, string | string[]>
       timeout?: number
       maxRedirect?: number
-      signal?: AbortController['signal']
+      // signal?: AbortController['signal']
+      signal?: unknown
       json?: Record<string, unknown>
       form?: Record<string, string | number | null | undefined | boolean>
       binary?: Uint8Array
@@ -700,7 +730,9 @@ declare global {
       body: Resp
     }
 
-    type BufferFormat = 'binary' | 'base64' | 'hex' | 'utf-8' | 'utf8'
+    type ConverterFormatFrom = 'base64' | 'hex' | 'utf-8'
+    type ConverterFormatTo = 'binary' | 'base64' | 'hex' | 'utf-8'
+    type ConverterBinaryFormatTo = 'base64' | 'hex' | 'utf-8'
     interface BufferToStringTypes {
       binary: number[] | Uint8Array
       base64: string
@@ -741,7 +773,7 @@ declare global {
       /** Controls if a password input is shown. Password input hides the typed text. */
       password?: boolean
       /** An optional string to show as placeholder in the input box to guide the user what to type. */
-      placeHolder?: string
+      placeholder?: string
     }
     interface BoolOptions extends FormItemBase<boolean> {
       type: 'boolean'
@@ -758,22 +790,36 @@ declare global {
       type: 'selection'
       enum: Array<EnumItem<T>>
     }
-    interface FormDialogOptions {
+    // interface FormDialogOptions {
+    //   signal?: unknown
+    //   /** An optional string that represents the title of the form dialog. */
+    //   title?: string
+    //   /** An optional string that represents the description of the form dialog. */
+    //   description?: string
+    //   /** The form items */
+    //   items: Array<InputOptions | BoolOptions | RadioOptions | SelectionOptions>
+    //   /** An optional function that will be called to validate input and to give a hint to the user. */
+    //   validateInput?: (index: number, value: string) => null | undefined | string
+    // }
+    interface InputDialogOptions {
       signal?: unknown
-      /** An optional string that represents the title of the form dialog. */
+      /** Controls if a password input is shown. Password input hides the typed text. */
+      password?: boolean
+      /** An optional string to show as placeholder in the input box to guide the user what to type. */
+      placeholder?: string
+      /** The text to display underneath the input box. */
+      prompt?: string
+      /** An optional string that represents the title of the input box. */
       title?: string
-      /** An optional string that represents the description of the form dialog. */
-      description?: string
-      /** The form items */
-      items: Array<InputOptions | BoolOptions | RadioOptions | SelectionOptions>
+      /** The value to pre-fill in the input box. */
+      value?: string
       /** An optional function that will be called to validate input and to give a hint to the user. */
-      validateInput?: (index: number, value: string) => null | undefined | string
+      validateInput?: (value: string) => Promise<null | undefined | string>
     }
 
     interface OpenDialogOptions {
-      signal?: unknown
       /** The resource the dialog shows when opened. */
-      defaultPath?: string
+      // defaultPath?: string
       /** A human-readable string for the open button. */
       openLabel?: string
       /** Allow to select files, defaults to `true`. */
@@ -799,13 +845,12 @@ declare global {
        * This parameter might be ignored, as not all operating systems display a title on open dialogs
        * (for example, macOS).
        */
-      title?: string
+      title: string
     }
 
     interface SaveDialogOptions {
-      signal?: unknown
       /** The resource the dialog shows when opened. */
-      defaultPath?: string
+      // defaultPath?: string
       /** A human-readable string for the save button. */
       saveLabel?: string
       /**
@@ -825,7 +870,7 @@ declare global {
        * This parameter might be ignored, as not all operating systems display a title on save dialogs
        * (for example, macOS).
        */
-      title?: string
+      title: string
     }
 
     /** 环境相关 */
@@ -849,12 +894,18 @@ declare global {
     }
     /** 应用相关 */
     interface App {
-      showMessage: (message: string, options?: MessageDialogOptions) => Promise<number | undefined>
+      showMessage: (message: string, options?: MessageDialogOptions) => Promise<number>
       // TODO
-      showFormDialog: (options: FormDialogOptions) => Promise<string | undefined>
+      // showFormDialog: (options: FormDialogOptions) => Promise<string | undefined>
+      showInputDialog: (options: InputDialogOptions) => Promise<string>
       // showInput: (options: InputDialogOptions) => Promise<string | undefined>
-      showOpenDialog: (options: OpenDialogOptions) => Promise<string | string[] | undefined>
-      showSaveDialog: (options: SaveDialogOptions) => Promise<string | undefined>
+      showOpenDialog: (options: OpenDialogOptions) => Promise<string[]>
+      showSaveDialog: (options: SaveDialogOptions) => Promise<string>
+      readOpenDialogFile: <T extends 'utf-8' | 'binary' = 'binary'>(
+        path: string,
+        format?: T
+      ) => Promise<T extends 'utf-8' ? string : Uint8Array>
+      writeSaveDialogFile: (dir: string, name: string, content: string | Uint8Array) => Promise<string>
       // getConnectedClient: () => Promise<string[]>
     }
     interface MusicList {
@@ -914,9 +965,31 @@ declare global {
     }
     interface MusicUrlInfo {
       url: string
-      quality: Quality
+      quality: string
     }
 
+    type BuildListProviderActionCommonParams<D> = CommonParams & {
+      data: D
+    }
+    type ListProviderActionParams = BuildListProviderActionCommonParams<AnyListen.List.RemoteListInfo>
+    interface ListProviderAction {
+      createList: (params: ListProviderActionParams) => Promise<void>
+      updateList: (params: ListProviderActionParams) => Promise<void>
+      deleteList: (params: ListProviderActionParams) => Promise<void>
+      getListMusicIds: (params: ListProviderActionParams) => Promise<string[]>
+      getMusicInfoByIds: (
+        params: BuildListProviderActionCommonParams<{
+          list: AnyListen.List.RemoteListInfo
+          ids: string[]
+        }>
+      ) => Promise<{
+        musics: AnyListen.Music.MusicInfoOnline[]
+        waitingParseMetadata?: boolean
+      }>
+      parseMusicInfoMetadata: (
+        params: BuildListProviderActionCommonParams<AnyListen.Music.MusicInfoOnline>
+      ) => Promise<AnyListen.Music.MusicInfoOnline>
+    }
     type MusicSearchResult = ListCommonResult<AnyListen.Music.MusicInfoOnline>
 
     interface ResourceAction {
@@ -953,55 +1026,101 @@ declare global {
       error: (...args: unknown[]) => void
     }
     interface Storage {
-      getItem: <T>(key: string) => Promise<T>
-      getItems: <T extends unknown[]>(keys: string[]) => Promise<T>
-      setItem: (key: string, value: unknown) => Promise<void>
-      setItems: <T extends Array<[string, unknown]>>(datas: T) => Promise<void>
-      removeItem: (key: string) => Promise<void>
-      removeItems: (keys: string[]) => Promise<void>
-      clearItems: () => Promise<void>
-    }
-    interface Buffer {
-      from: (input: string | number[], encoding?: BufferFormat) => Uint8Array
-      bufToString: <T extends BufferFormat>(buf: number[] | Uint8Array, format: T) => BufferToStringTypes[T]
+      writeFile: (path: string, data: Uint8Array | string) => Promise<void>
+      readFile: <T extends 'utf-8' | 'binary' = 'utf-8'>(
+        path: string,
+        encoding?: T
+      ) => Promise<T extends 'utf-8' ? string : Uint8Array>
+      removeFile: (path: string) => Promise<void>
+      fileExists: (path: string) => Promise<boolean>
+      listFiles: (path?: string) => Promise<string[]>
+      statFile: (path: string) => Promise<{ isFile: boolean; size: number; createTime: number; updateTime: number }>
     }
     interface Crypto {
-      aesEncrypt: (mode: AES_MODE, data: Uint8Array | string, key: Uint8Array | string, iv: Uint8Array | string) => string
-      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array, key: Uint8Array | string) => string
-      randomBytes: (size: number) => Uint8Array
-      md5: (b64Data: string) => string
+      aesEncrypt: (
+        mode: AES_MODE,
+        data: Uint8Array | string,
+        key: Uint8Array | string,
+        iv: Uint8Array | string
+      ) => Promise<string>
+      rsaEncrypt: (mode: RSA_PADDING, data: Uint8Array, key: Uint8Array) => Promise<string>
+      randomBytes: (size: number) => Promise<Uint8Array>
+      md5: (text: string | Uint8Array) => Promise<string>
+      sha1: (text: string | Uint8Array) => Promise<string>
+      sha256: (text: string | Uint8Array) => Promise<string>
+      sha512: (text: string | Uint8Array) => Promise<string>
     }
     interface Iconv {
-      decode: (data: Uint8Array | Uint16Array, encoding: string) => string
-      encode: (data: string, encoding: string) => Uint8Array
+      decode: (data: Uint8Array | Uint16Array, encoding: string) => Promise<string>
+      encode: (data: string, encoding: string) => Promise<Uint8Array>
+    }
+    interface Zlib {
+      deflate: <T extends 'base64' | 'binary' = 'binary'>(
+        data: Uint8Array | string,
+        encoding?: T
+      ) => Promise<T extends 'base64' ? string : Uint8Array>
+      inflate: <T extends 'utf-8' | 'binary' = 'binary'>(
+        data: Uint8Array | string,
+        encoding?: T
+      ) => Promise<T extends 'utf-8' ? string : Uint8Array>
     }
     interface Configuration {
-      getConfigs: (key: string[]) => Promise<string[]>
-      setConfigs: (datas: Array<[string, string]>) => Promise<void>
+      getConfigs: <T extends unknown[] = []>(keys: string[]) => Promise<WithUndefined<T>>
+      setConfigs: (datas: Record<string, unknown>) => Promise<void>
       onConfigChanged: (callback: (keys: string[], configuration: Record<string, unknown>) => void) => () => void
+    }
+    interface MusicUtils {
+      createProxyUrl: (url: string, options?: RequestOptions, enabledCache?: boolean) => Promise<string>
+      writeProxyCache: (fileName: string, data: Uint8Array) => Promise<string>
+    }
+    interface IsolateContext {
+      sendMessage: (message: unknown) => Promise<void>
+      run: (code: string) => Promise<void>
+      runFile: (filePath: string) => Promise<void>
+      destroy: () => Promise<void>
+    }
+    interface Command {
+      registerCommand: (command: string, callback: (...args: unknown[]) => Promise<unknown>) => Promise<() => void>
+      executeCommand: (command: string, ...args: unknown[]) => Promise<unknown>
+      getCommands: (filterInternal?: boolean) => Promise<string[]>
     }
     interface API {
       env: Env
       app: App
-      musicList: MusicList
-      player: Player
+      musicList?: MusicList
+      player?: Player
+      musicUtils: MusicUtils
       /** http 请求 */
-      request: <Resp = unknown>(url: string, options?: RequestOptions) => Promise<Response<Resp>>
+      request?: <Resp = unknown>(url: string, options?: RequestOptions) => Promise<Response<Resp>>
       t: (key: string, data?: Record<string, string | number | null | undefined>) => string
       logcat: Logcat
       storage: Storage
       configuration: Configuration
       registerResourceAction: (actions: Partial<ResourceAction>) => void
       // TODO
-      backup: {
-        runBackup: (opts: { backupData?: Array<'list' | 'dislike'> }) => Promise<void>
-        registerDataAction: (actions: BackupDataAction) => void
-      }
+      // backup: {
+      //   runBackup: (opts: { backupData?: Array<'list' | 'dislike'> }) => Promise<void>
+      //   registerDataAction: (actions: BackupDataAction) => void
+      // }
       utils: {
-        buffer: Buffer
         crypto: Crypto
         iconv: Iconv
+        zlib: Zlib
+        createIsolateContext?: (onMessage: (message: unknown) => void) => Promise<IsolateContext>
+
+        dataConverter: {
+          <R extends ConverterFormatTo = 'binary'>(
+            input: string,
+            fromEncoding?: ConverterFormatFrom,
+            toEncoding?: R
+          ): Promise<R extends 'binary' ? Uint8Array : string>
+          <R extends ConverterBinaryFormatTo = 'utf-8'>(
+            input: Uint8Array,
+            toEncoding?: R
+          ): Promise<R extends 'binary' ? Uint8Array : string>
+        }
       }
+      command: Command
     }
   }
 }

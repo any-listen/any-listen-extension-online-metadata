@@ -1,3 +1,3 @@
-### Fixed
+### Changed
 
-- fix publish name
+- follow up and support Promise API

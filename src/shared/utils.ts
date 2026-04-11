@@ -1,4 +1,4 @@
-import { buffer, t } from '@/shared/hostApi'
+import { dataConverter, t } from '@/shared/hostApi'
 import he from 'he'
 
 export * from './common'
@@ -56,6 +56,6 @@ export const decodeName = (str: string | null = '') => {
   return he.decode(str)
 }
 
-export const b64DecodeUnicode = (str: string): string => {
-  return buffer.bufToString(buffer.from(str, 'base64'), 'utf8')
+export const b64DecodeUnicode = async (str: string): Promise<string> => {
+  return dataConverter(str, 'base64', 'utf-8')
 }
