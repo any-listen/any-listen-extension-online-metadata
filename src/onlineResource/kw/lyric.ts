@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { console, dataConverter, request } from '@/shared/hostApi'
-import { lrcTools } from './util'
-import decodeLyric from './decodeLyric'
 import { decodeName } from '@/shared/utils'
+
+import decodeLyric from './decodeLyric'
+import { lrcTools } from './util'
 
 const buf_key = new Uint8Array([121, 101, 101, 108, 105, 111, 110])
 const buf_key_len = buf_key.length
@@ -72,12 +74,14 @@ const sortLrcArr = (arr: LrcLine[]) => {
   }
 }
 const transformLrc = (tags: string[], lrclist: LrcLine[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return `${tags.join('\n')}\n${lrclist ? lrclist.map((l) => `[${l.time}]${l.text}\n`).join('') : '暂无歌词'}`
 }
 const parseLrc = (lrc: string) => {
   const lines = lrc.split(/\r\n|\r|\n/)
   const tags = []
   const lrcArr = []
+  // eslint-disable-next-line @typescript-eslint/prefer-for-of
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim()
     const result = timeExp.exec(line)
@@ -113,13 +117,11 @@ export const getLyric = async (musicInfo: AnyListen_API.MusicInfo, isGetLyricx =
     awlyric?: string
     rlyric?: string
   }
-  try {
-    lrcInfo = parseLrc(rawLrc)
-  } catch {
-    throw new Error('Get lyric failed')
-  }
+
+  lrcInfo = parseLrc(rawLrc)
+
   // console.log(lrcInfo)
-  if (lrcInfo.tlyric) lrcInfo.tlyric = lrcInfo.tlyric.replace(lrcTools.rxps.wordTimeAll, '')
+  lrcInfo.tlyric &&= lrcInfo.tlyric.replace(lrcTools.rxps.wordTimeAll, '')
   try {
     lrcInfo.awlyric = lrcTools.parse(lrcInfo.lyric)
   } catch {

@@ -1,18 +1,9 @@
 {
+  "extends": "@any-listen/extension-kit/tsconfig.node.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-    "lib": ["ESNext"],
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": false,
-    "module": "ESNext",
-    "checkJs": true,
     "composite": true,
-    "outDir": "./dist",
-    "allowSyntheticDefaultImports": true,
-    "emitDeclarationOnly": true,
-    "allowImportingTsExtensions": true,
-    "types": ["@types/node"]
+    "rootDir": "./",
+    "types": ["node"]
   },
-  "include": ["scripts/**/*.js", "package.json", "package.json", "config.ts"]
+  "include": ["package.json", "config.ts"]
 }

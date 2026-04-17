@@ -80,7 +80,7 @@ export interface Lyric {
 
 export interface LyricLangs {
   content: Array<{
-    lyricContent: Array<string[]>
+    lyricContent: string[][]
     type: number
     language: number
   }>

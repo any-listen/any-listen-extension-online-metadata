@@ -16,3 +16,4 @@ export const t = api.t
 export const crypto = api.utils.crypto
 export const dataConverter = api.utils.dataConverter
 export const iconv = api.utils.iconv
+export const zlib = api.utils.zlib

@@ -1,8 +1,9 @@
 /* eslint-disable no-fallthrough */
 import { formatPlayTime, sizeFormate } from '@/shared/utils'
-import { eapiRequest } from './utils'
-import { Resource, MusicSearch } from './types/musicSearch'
+
 import { formatSingerName } from '../shared'
+import type { Resource, MusicSearch } from './types/musicSearch'
+import { eapiRequest } from './utils'
 
 const pageInfo = {
   limit: 30,
@@ -39,6 +40,7 @@ const handleResult = (rawList: Resource[]): AnyListen_API.MusicInfoOnline[] => {
     const types: AnyListen_API.MusicInfoOnline['meta']['qualitys'] = {}
     let size
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     if (item.privilege.maxBrLevel == 'hires') {
       size = item.hr ? sizeFormate(item.hr.size) : null
       types.flac24bit = {
@@ -86,10 +88,10 @@ const handleResult = (rawList: Resource[]): AnyListen_API.MusicInfoOnline[] => {
 }
 
 export const search = async (str: string, page = 1, limit?: number): Promise<AnyListen_API.MusicSearchResult> => {
-  if (limit == null) limit = pageInfo.limit
+  limit ??= pageInfo.limit
   return musicSearch(str, page, limit).then((result) => {
     // console.log(result)
-    if (!result || result.code !== 200) throw new Error('search error')
+    if (result?.code !== 200) throw new Error('search error')
     const list = handleResult(result.data.resources || [])
     // console.log(list)
     if (list == null) throw new Error('search error')

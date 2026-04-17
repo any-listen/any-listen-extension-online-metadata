@@ -1,5 +1,6 @@
 import { request } from '@/shared/hostApi'
 import { dateFormat, decodeName, formatPlayCount, formatPlayTime, sizeFormate } from '@/shared/utils'
+
 import { formatSingerName } from '../shared'
 
 const pageInfo = {
@@ -52,7 +53,7 @@ const filterInfoHotTag = (html: string) => {
   if (!hotTag) return hotTags
 
   hotTag.forEach((tagHtml) => {
-    let result = tagHtml.match(regExps.hotTag)
+    let result = regExps.hotTag.exec(tagHtml)
     if (!result) return
     hotTags.push({
       id: parseInt(result[1]),

@@ -1,5 +1,6 @@
-import { registerResourceAction, t } from '@/shared/hostApi'
-import { Sources, sources } from './sources'
+import { console, registerResourceAction, t } from '@/shared/hostApi'
+
+import { type Sources, sources } from './sources'
 
 export const initOnlineResource = () => {
   registerResourceAction({
@@ -22,7 +23,10 @@ export const initOnlineResource = () => {
       return pic
     },
     async musicLyric(params) {
-      const lyric = await sources[params.source as Sources].getLyric(params.musicInfo)
+      const lyric = await sources[params.source as Sources].getLyric(params.musicInfo).catch((e) => {
+        console.error(e)
+        throw e
+      })
       return {
         name: params.musicInfo.name,
         singer: params.musicInfo.singer,

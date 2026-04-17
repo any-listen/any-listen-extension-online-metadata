@@ -1,35 +1,28 @@
 {
   "name": "online-metadata",
   "version": "0.2.9",
-  "type": "module",
-  "scripts": {
-    "dev": "node --env-file=.env scripts/dev.js",
-    "build": "node --env-file=.env scripts/build.js",
-    "pub": "node scripts/publish.js",
-    "build:publish": "node scripts/build.js"
-  },
+  "keywords": [
+    "any-listen",
+    "any-listen-extension"
+  ],
   "homepage": "https://github.com/any-listen/any-listen-extension-online-metadata#readme",
   "license": "Apache-2.0",
   "author": "",
-  "download_url_template": "https://github.com/any-listen/any-listen-extension-online-metadata/releases/download/v{version}",
-  "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@types/he": "^1.2.3",
-    "@types/node": "^22.19.17",
-    "@types/pako": "^2.0.4",
-    "eslint": "^9.39.4",
-    "globals": "^16.5.0",
-    "prettier": "^3.8.2",
-    "prettier-plugin-organize-imports": "^4.3.0",
-    "prettier-plugin-packagejson": "^3.0.2",
-    "tar": "^7.5.13",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.58.1",
-    "vite": "^7.3.2"
+  "type": "module",
+  "scripts": {
+    "build": "extension-kit --build",
+    "pub": "extension-kit --publish"
   },
   "dependencies": {
-    "he": "^1.2.0",
-    "pako": "^2.1.0"
+    "he": "^1.2.0"
   },
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+  "devDependencies": {
+    "@any-listen/extension-kit": "^0.1.0",
+    "@types/he": "^1.2.3",
+    "@types/node": "^25.6.0",
+    "eslint": "^9.39.4",
+    "oxfmt": "^0.44.0"
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
+  "download_url_template": "https://github.com/any-listen/any-listen-extension-online-metadata/releases/download/v{version}"
 }

@@ -1,9 +1,9 @@
 {
   "prettier.useEditorConfig": true,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSaveMode": "file",
   "editor.codeActionsOnSave": {
-    "source.fixAll.stylelint": "explicit",
     "source.fixAll.eslint": "explicit"
   },
   "eslint.validate": ["javascript", "typescript"],
@@ -13,7 +13,5 @@
   "i18n-ally.displayLanguage": "zh-cn",
   "i18n-ally.sourceLanguage": "zh-cn",
   "i18n-ally.translate.engines": ["google-cn", "google"],
-  "i18n-ally.sortKeys": true,
-  "javascript.preferences.importModuleSpecifier": "non-relative",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "i18n-ally.sortKeys": true
 }

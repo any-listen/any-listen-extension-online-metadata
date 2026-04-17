@@ -1,4 +1,5 @@
 import { console } from '@/shared/hostApi'
+
 import { getMusicInfo } from './musicInfo'
 
 export const getPic = async (music: AnyListen_API.MusicInfo) => {

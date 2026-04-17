@@ -1,14 +1,15 @@
 // https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/module/song_detail.js
 import { request } from '@/shared/hostApi'
+
+import type { MusicInfo } from './types/musicinfo'
 import { weapi } from './utils/crypto'
-import { MusicInfo } from './types/musicinfo'
 
 export const getMusicInfo = async ({ meta }: AnyListen_API.MusicInfo) => {
   const resp = await request<MusicInfo>('https://music.163.com/weapi/v3/song/detail', {
     method: 'POST',
     headers: {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
-      Referer: 'https://music.163.com/song?id=' + meta.musicId,
+      Referer: `https://music.163.com/song?id=${meta.musicId}`,
       origin: 'https://music.163.com',
     },
     form: await weapi({

@@ -103,7 +103,7 @@ export interface PayInfo {
   nplay: string
   overseas_ndown: string
   overseas_nplay: string
-  paytagindex: { [key: string]: number }
+  paytagindex: Record<string, number>
   play: string
   refrain_end: string
   refrain_start: string

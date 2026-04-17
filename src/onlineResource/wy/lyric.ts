@@ -1,6 +1,7 @@
 import { console, request } from '@/shared/hostApi'
+
+import type { Lyric } from './types/lyric'
 import { eapi } from './utils/crypto'
-import { Lyric } from './types/lyric'
 
 const eapiRequest = async <T = unknown>(url: string, data: object) => {
   const resp = await request<T>('https://interface3.music.163.com/eapi/song/lyric/v1', {
@@ -199,8 +200,7 @@ const fixTimeLabel = (lrc: string, tlrc?: string, romalrc?: string) => {
     if (newLrc != lrc || newTlrc != tlrc) {
       lrc = newLrc
       tlrc = newTlrc
-      if (romalrc)
-        romalrc = romalrc.replace(/\[(\d{2}:\d{2}):(\d{2,3})]/g, '[$1.$2]').replace(/\[(\d{2}:\d{2}\.\d{2})0]/g, '[$1]')
+      romalrc &&= romalrc.replace(/\[(\d{2}:\d{2}):(\d{2,3})]/g, '[$1.$2]').replace(/\[(\d{2}:\d{2}\.\d{2})0]/g, '[$1]')
     }
   }
 

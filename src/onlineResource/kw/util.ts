@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 export const formatSinger = (rawData: string) => rawData.replace(/&/g, '、')
 
 interface PrevWord {
@@ -46,9 +47,8 @@ export const lrcTools = {
     if (result) {
       const time = result[1]
       let words = result[2]
-      if (words == null) {
-        words = ''
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      words ??= ''
       const wordTimes = words.match(this.rxps.wordTimeAll)
       if (!wordTimes) return
       // console.log(wordTimes)
@@ -67,6 +67,7 @@ export const lrcTools = {
     if (!result) return
     if (result[1] == 'kuwo') {
       let content = result[2]
+      // eslint-disable-next-line @typescript-eslint/prefer-optional-chain, @typescript-eslint/no-unnecessary-condition
       if (content != null && content.includes('][')) {
         content = content.substring(0, content.indexOf(']['))
       }
@@ -98,6 +99,7 @@ export const lrcTools = {
     let lrcs = tools.lines.join('\n')
     if (tools.tags.length) lrcs = `${tools.tags.join('\n')}\n${lrcs}`
     // console.log(lrcs)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return lrcs
   },
 }

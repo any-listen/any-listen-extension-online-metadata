@@ -1,7 +1,8 @@
 import { console, dataConverter, request } from '@/shared/hostApi'
-import { Lyric, LyricLangs, LyricSearch } from './types/lyric'
-import { decodeKrc } from './utils'
 import { decodeName } from '@/shared/utils'
+
+import type { Lyric, LyricLangs, LyricSearch } from './types/lyric'
+import { decodeKrc } from './utils'
 
 const searchLyric = async (name: string, hash: string, time: number) => {
   const { body } = await request<LyricSearch>(
@@ -25,7 +26,7 @@ const headExp = /^.*\[id:\$\w+\]\n/
 const parseLyric = async (str: string) => {
   str = str.replace(/\r/g, '')
   if (headExp.test(str)) str = str.replace(headExp, '')
-  const trans = str.match(/\[language:([\w=\\/+]+)\]/)
+  const trans = /\[language:([\w=\\/+]+)\]/.exec(str)
   let rlyricRaw: string[][]
   let tlyricRaw: string[][]
   const rlyric: string[] = []
@@ -46,7 +47,7 @@ const parseLyric = async (str: string) => {
   }
   let i = 0
   let awlyric = str.replace(/\[((\d+),\d+)\].*/g, (str) => {
-    const result = str.match(/\[((\d+),\d+)\].*/)
+    const result = /\[((\d+),\d+)\].*/.exec(str)
     let time = parseInt(result![2])
     const ms = time % 1000
     time /= 1000
@@ -56,7 +57,9 @@ const parseLyric = async (str: string) => {
     time %= 60
     const s = Math.trunc(time).toString().padStart(2, '0')
     const timeLabel = `${m}:${s}.${ms}`
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (rlyricRaw) rlyric[i] = `[${timeLabel}]${rlyricRaw[i]?.join('') ?? ''}`
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (tlyricRaw) tlyric[i] = `[${timeLabel}]${tlyricRaw[i]?.join('') ?? ''}`
     i++
     return str.replace(result![1], timeLabel)

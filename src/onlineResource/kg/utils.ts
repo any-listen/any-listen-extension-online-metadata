@@ -2,9 +2,9 @@
 //   console.log(str)
 // })
 
-import { dataConverter } from '@/shared/hostApi'
+import { dataConverter, zlib } from '@/shared/hostApi'
+
 import { toMD5 } from '../shared'
-import pako from 'pako'
 
 /**
  * 签名
@@ -26,5 +26,5 @@ export const decodeKrc = async (str: string) => {
   for (let i = 0, len = buf_str.length; i < len; i++) {
     buf_str[i] = buf_str[i] ^ enc_key[i % 16]
   }
-  return pako.inflate(buf_str, { to: 'string' })
+  return zlib.inflate(buf_str, 'utf-8')
 }

@@ -1,7 +1,8 @@
 import { console, request } from '@/shared/hostApi'
-import { formatSinger } from './util'
-import { SearchResult } from './types/musicSearch'
 import { decodeName, formatPlayTime } from '@/shared/utils'
+
+import type { SearchResult } from './types/musicSearch'
+import { formatSinger } from './util'
 
 const regExps = {
   mInfo: /level:(\w+),bitrate:(\d+),format:(\w+),size:([\w.]+)/,
@@ -22,6 +23,7 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
   const result: AnyListen_API.MusicInfoOnline[] = []
   if (!rawData) return result
   // console.log(rawData)
+  // eslint-disable-next-line @typescript-eslint/prefer-for-of
   for (let i = 0; i < rawData.length; i++) {
     const info = rawData[i]
     const songId = info.MUSICRID.replace('MUSIC_', '')
@@ -36,7 +38,7 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
 
     const infoArr = info.N_MINFO.split(';')
     for (const info of infoArr) {
-      const result = info.match(regExps.mInfo)
+      const result = regExps.mInfo.exec(info)
       if (result) {
         switch (result[2]) {
           case '4000':
@@ -87,16 +89,16 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
   // console.log(result)
   return result
 }
-export const search = async (str: string, page = 1, limit?: number, retryNum = 0): Promise<AnyListen_API.MusicSearchResult> => {
-  if (retryNum > 2) return Promise.reject(new Error('try max num'))
-  if (limit == null) limit = pageInfo.limit
+export const search = async (str: string, page = 1, limit?: number): Promise<AnyListen_API.MusicSearchResult> => {
+  limit ??= pageInfo.limit
   // http://newlyric.kuwo.cn/newlyric.lrc?62355680
   const result = await musicSearch(str, page, limit)
   // console.log(result)
-  if (!result || (result.TOTAL !== '0' && result.SHOW === '0')) return search(str, page, limit, ++retryNum)
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!result || (result.TOTAL !== '0' && result.SHOW === '0')) return search(str, page, limit)
   const list = handleResult(result.abslist)
 
-  if (list == null) return search(str, page, limit, ++retryNum)
+  if (list == null) return search(str, page, limit)
 
   pageInfo.total = parseInt(result.TOTAL)
   pageInfo.page = page

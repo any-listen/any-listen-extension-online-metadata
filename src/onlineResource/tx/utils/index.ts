@@ -1,4 +1,5 @@
 import { request } from '@/shared/hostApi'
+
 import { zzcSign } from './crypto'
 
 export const signRequest = async <T>(data: Record<string, unknown>) => {

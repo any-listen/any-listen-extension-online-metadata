@@ -1,7 +1,8 @@
 import { request } from '@/shared/hostApi'
-import { Grp, List, MusicSearch } from './types/musicSearch'
 import { decodeName, formatPlayTime, sizeFormate } from '@/shared/utils'
+
 import { formatSingerName } from '../shared'
+import type { Grp, List, MusicSearch } from './types/musicSearch'
 
 const pageInfo = {
   limit: 30,
@@ -77,6 +78,7 @@ const handleResult = (rawData: List[]) => {
     if (ids.has(key)) return
     ids.add(key)
     list.push(filterData(item))
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     for (const childItem of item?.Grp ?? []) {
       const key = item.Audioid + item.FileHash
       if (ids.has(key)) continue
@@ -88,7 +90,7 @@ const handleResult = (rawData: List[]) => {
 }
 
 export const search = async (str: string, page = 1, limit?: number): Promise<AnyListen_API.MusicSearchResult> => {
-  if (limit == null) limit = pageInfo.limit
+  limit ??= pageInfo.limit
   // http://newlyric.kuwo.cn/newlyric.lrc?62355680
   const result = await musicSearch(str, page, limit)
   const list = handleResult(result.data.lists)

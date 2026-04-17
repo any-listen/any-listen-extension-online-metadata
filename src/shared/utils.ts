@@ -1,5 +1,6 @@
-import { dataConverter, t } from '@/shared/hostApi'
 import he from 'he'
+
+import { dataConverter, t } from '@/shared/hostApi'
 
 export * from './common'
 
@@ -9,8 +10,8 @@ export function compareVer(currentVer: string, targetVer: string): -1 | 0 | 1 {
   // replacing them with a negative number based on charcode of each character
   const fix = (s: string) => `.${s.toLowerCase().charCodeAt(0) - 2147483647}.`
 
-  const currentVerArr: Array<string | number> = ('' + currentVer).replace(/[^0-9.]/g, fix).split('.')
-  const targetVerArr: Array<string | number> = ('' + targetVer).replace(/[^0-9.]/g, fix).split('.')
+  const currentVerArr: Array<string | number> = currentVer.replace(/[^0-9.]/g, fix).split('.')
+  const targetVerArr: Array<string | number> = targetVer.replace(/[^0-9.]/g, fix).split('.')
   const c = Math.max(currentVerArr.length, targetVerArr.length)
   for (let i = 0; i < c; i++) {
     // convert to integer the most efficient way
@@ -26,7 +27,8 @@ export const filterMusicList = <T extends AnyListen_API.MusicInfo>(list: T[]): T
   const ids = new Set<string>()
   return list.filter((s) => {
     if (!s.id || ids.has(s.id) || !s.name) return false
-    if (s.singer == null) s.singer = ''
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    s.singer ??= ''
     ids.add(s.id)
     return true
   })

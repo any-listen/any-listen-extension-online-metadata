@@ -1,6 +1,7 @@
 import { console, request } from '@/shared/hostApi'
 import { b64DecodeUnicode, decodeName } from '@/shared/utils'
-import { Lyric } from './types/lyric'
+
+import type { Lyric } from './types/lyric'
 
 // const regexps = {
 //   matchLrc: /.+"lyric":"([\w=+/]*)".+/,

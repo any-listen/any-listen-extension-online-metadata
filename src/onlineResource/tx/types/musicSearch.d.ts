@@ -59,7 +59,7 @@ export interface Gedantip {
 
 export interface ItemSong {
   act: number
-  action: { [key: string]: number }
+  action: Record<string, number>
   album: Album
   author: string
   bpm: number

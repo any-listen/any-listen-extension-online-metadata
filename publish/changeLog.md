@@ -1,7 +1,3 @@
-### Fix
+### Other
 
-- fix tx search
-
-### Changed
-
-- follow up and support Promise API
+- build tools migrated to extension-kit

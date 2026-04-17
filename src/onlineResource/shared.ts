@@ -13,8 +13,10 @@ export const formatSingerName = <T extends any[]>(singers: T, nameKey = 'name', 
   if (Array.isArray(singers)) {
     const singer: string[] = []
     singers.forEach((item) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const name = item[nameKey]
       if (!name) return
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       singer.push(name)
     })
     return decodeName(singer.join(join))

@@ -1,8 +1,9 @@
-import { ItemSong, MusicSearch } from './types/musicSearch'
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { formatPlayTime, sizeFormate } from '@/shared/utils'
+
 import { formatSingerName } from '../shared'
+import type { ItemSong, MusicSearch } from './types/musicSearch'
 import { signRequest } from './utils'
-import { console } from '@/shared/hostApi'
 
 const pageInfo = {
   limit: 30,
@@ -139,7 +140,7 @@ const handleResult = (rawList: ItemSong[]) => {
   return list
 }
 export const search = async (str: string, page = 1, limit?: number): Promise<AnyListen_API.MusicSearchResult> => {
-  if (limit == null) limit = pageInfo.limit
+  limit ??= pageInfo.limit
   // http://newlyric.kuwo.cn/newlyric.lrc?62355680
   const { body, meta } = await musicSearch(str, page, limit)
   const list = handleResult(body.item_song)

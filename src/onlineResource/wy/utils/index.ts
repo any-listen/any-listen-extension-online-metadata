@@ -1,4 +1,5 @@
 import { request } from '@/shared/hostApi'
+
 import { eapi } from './crypto'
 
 export const eapiRequest = async <T = unknown>(url: string, data: object) => {
