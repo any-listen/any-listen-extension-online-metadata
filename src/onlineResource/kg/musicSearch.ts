@@ -51,7 +51,7 @@ const filterData = (rawData: List | Grp): AnyListen_API.MusicInfoOnline => {
   }
   return {
     id: String(rawData.Audioid),
-    name: decodeName(rawData.SongName),
+    name: decodeName(`${rawData.OriSongName}${rawData.Suffix ? ` ${rawData.Suffix}` : ''}`),
     singer: decodeName(formatSingerName(rawData.Singers, 'name')),
     interval: formatPlayTime(rawData.Duration),
     isLocal: false,
@@ -78,7 +78,7 @@ const handleResult = (rawData: List[]) => {
     if (ids.has(key)) return
     ids.add(key)
     list.push(filterData(item))
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     for (const childItem of item?.Grp ?? []) {
       const key = item.Audioid + item.FileHash
       if (ids.has(key)) continue

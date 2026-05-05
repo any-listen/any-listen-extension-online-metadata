@@ -274,12 +274,7 @@ export interface Singer {
   id: number
 }
 
-export enum Suffix {
-  DJ何鹏版 = '(DJ何鹏版)',
-  DJ版 = '(DJ版)',
-  Empty = '',
-  童声版 = '(童声版)',
-}
+export type Suffix = string
 
 export enum Type {
   Audio = 'audio',

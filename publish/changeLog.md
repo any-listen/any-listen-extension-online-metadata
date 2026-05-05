@@ -1,3 +1,3 @@
-### Other
+### Fix
 
-- build tools migrated to extension-kit
+- fix kg search
