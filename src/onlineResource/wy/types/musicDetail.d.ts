@@ -1,4 +1,4 @@
-export interface MusicInfo {
+export interface MusicDetail {
   songs: Song[]
   privileges: Privilege[]
   code: number
@@ -22,18 +22,22 @@ export interface Privilege {
   preSell: boolean
   playMaxbr: number
   downloadMaxbr: number
-  maxBrLevel: string
-  playMaxBrLevel: string
-  downloadMaxBrLevel: string
-  plLevel: string
-  dlLevel: string
-  flLevel: string
+  maxBrLevel: Level
+  playMaxBrLevel: Level
+  downloadMaxBrLevel: Level
+  plLevel: Level
+  dlLevel: Level
+  flLevel: Level
   rscl: null
   freeTrialPrivilege: FreeTrialPrivilege
   rightSource: number
   chargeInfoList: ChargeInfoList[]
   code: number
   message: null
+  plLevels: null
+  dlLevels: null
+  ignoreCache: null
+  bd: null
 }
 
 export interface ChargeInfoList {
@@ -43,36 +47,40 @@ export interface ChargeInfoList {
   chargeType: number
 }
 
+export type Level = 'exhigh' | 'hires' | 'lossless' | 'none' | 'standard'
+
 export interface FreeTrialPrivilege {
   resConsumable: boolean
   userConsumable: boolean
   listenType: null
-  cannotListenReason: number
+  cannotListenReason: null
   playReason: null
   freeLimitTagType: null
 }
 
 export interface Song {
   name: string
+  mainTitle: null | string
+  additionalTitle: null | string
   id: number
   pst: number
   t: number
   ar: Ar[]
-  alia: any[]
+  alia: string[]
   pop: number
   st: number
-  rt: null
+  rt: null | string
   fee: number
   v: number
   crbt: null
   cf: string
   al: Al
   dt: number
-  h: H
-  m: H
-  l: H
-  sq: null
-  hr: null
+  h: L | null
+  m: L | null
+  l: L
+  sq: L | null
+  hr: L | null
   a: null
   cd: string
   no: number
@@ -84,29 +92,34 @@ export interface Song {
   s_id: number
   mark: number
   originCoverType: number
-  originSongSimpleData: null
+  originSongSimpleData: OriginSongSimpleData | null
   tagPicList: null
   resourceState: boolean
   version: number
   songJumpInfo: null
   entertainmentTags: null
   awardTags: null
-  displayTags: null
+  displayTags: string[]
+  artistClassics: boolean
+  markTags: any[]
+  songFeature: null
   single: number
-  noCopyrightRcmd: NoCopyrightRcmd
-  cp: number
+  noCopyrightRcmd: null
+  mv: number
   rtype: number
   rurl: null
   mst: number
-  mv: number
+  cp: number
   publishTime: number
+  tns?: string[]
 }
 
 export interface Al {
   id: number
   name: string
   picUrl: string
-  tns: any[]
+  tns: string[]
+  pic_str?: string
   pic: number
 }
 
@@ -117,7 +130,7 @@ export interface Ar {
   alias: any[]
 }
 
-export interface H {
+export interface L {
   br: number
   fid: number
   size: number
@@ -125,10 +138,14 @@ export interface H {
   sr: number
 }
 
-export interface NoCopyrightRcmd {
-  type: number
-  typeDesc: string
-  songId: null
-  thirdPartySong: null
-  expInfo: null
+export interface OriginSongSimpleData {
+  songId: number
+  name: string
+  artists: AlbumMeta[]
+  albumMeta: AlbumMeta
+}
+
+export interface AlbumMeta {
+  id: number
+  name: string
 }

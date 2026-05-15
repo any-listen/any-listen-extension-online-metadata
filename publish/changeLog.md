@@ -1,3 +1,3 @@
-### Fix
+### Add
 
-- fix kg search
+- support online resource

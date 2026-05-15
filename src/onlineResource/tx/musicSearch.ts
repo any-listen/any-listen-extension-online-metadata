@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { formatPlayTime, sizeFormate } from '@/shared/utils'
 
 import { formatSingerName } from '../shared'

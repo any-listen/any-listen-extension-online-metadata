@@ -54,7 +54,7 @@ export enum MetaDatum {
 
 export interface SimpleSongData {
   name: string
-  mainTitle: any | null
+  mainTitle: unknown
   additionalTitle: null | string
   id: number
   pst: number
@@ -194,13 +194,7 @@ export enum LLevel {
   None = 'none',
 }
 
-export enum MaxBrLevel {
-  Exhigh = 'exhigh',
-  Higher = 'higher',
-  Hires = 'hires',
-  Lossless = 'lossless',
-  None = 'none',
-}
+export type MaxBrLevel = 'exhigh' | 'higher' | 'hires' | 'lossless' | 'none'
 
 export interface FreeTrialPrivilege {
   resConsumable: boolean
@@ -215,7 +209,7 @@ export interface EXTInfo {
   algClickableTags: AlgClickableTag[]
   songAlias: string
   artistTns: string
-  lyrics: Lyrics
+  lyrics: any
   songCreator: null
   memberGuidanceInfo: null
   noCopyRight: boolean
@@ -250,8 +244,6 @@ export interface AlgClickableTag {
   sceneTag: null | string
   resourceId: string
 }
-
-export interface Lyrics {}
 
 export enum ResourceName {
   单曲 = '单曲',

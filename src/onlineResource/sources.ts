@@ -1,5 +1,6 @@
 import kg from './kg'
 import kw from './kw'
+import mg from './mg'
 import tx from './tx'
 import wy from './wy'
 
@@ -8,7 +9,7 @@ export const sources = {
   tx,
   wy,
   kg,
-  mg: null,
+  mg,
 } as const
 
-export type Sources = Exclude<keyof typeof sources, 'mg'>
+export type Sources = keyof typeof sources

@@ -1,12 +1,18 @@
 {
   "count_billion": "{num} 亿",
   "count_ten_thousand": "{num} 万",
-  "description": "从播放的歌曲匹配在线歌曲封面、歌词",
+  "description": "从播放的歌曲匹配在线歌曲封面、歌词，查询某些平台的公开在线资源",
   "displayName": "在线歌曲信息",
   "extensionOnlineMetadata.errorVersionTooLow": "当前 Any Listen 版本过低，请更新到最新版本！",
   "kgName": "酷狗音乐",
   "kwName": "酷我音乐",
+  "mgName": "咪咕音乐",
   "onlineResource.picNotFound": "获取图片失败",
+  "songlist.sort.hot": "最热",
+  "songlist.sort.hot_collect": "热藏",
+  "songlist.sort.new": "最新",
+  "songlist.sort.recommend": "推荐",
+  "songlist.sort.soaring": "飙升",
   "txName": "企鹅音乐",
   "wyName": "网易音乐"
 }

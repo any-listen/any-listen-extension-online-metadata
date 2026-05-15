@@ -21,22 +21,27 @@ const config: ExtensionConfig = {
       {
         id: 'kg',
         name: '{kgName}',
-        resource: ['musicSearch', 'musicPic', 'musicLyric'],
+        resource: ['musicSearch', 'musicPic', 'musicLyric', 'songlistSearch', 'songlist', 'topSongs', 'tipSearch', 'hotSearch'],
       },
       {
         id: 'kw',
         name: '{kwName}',
-        resource: ['musicSearch', 'musicPic', 'musicLyric'],
+        resource: ['musicSearch', 'musicPic', 'musicLyric', 'songlistSearch', 'songlist', 'topSongs', 'tipSearch', 'hotSearch'],
       },
       {
         id: 'wy',
         name: '{wyName}',
-        resource: ['musicSearch', 'musicPic', 'musicLyric'],
+        resource: ['musicSearch', 'musicPic', 'musicLyric', 'songlistSearch', 'songlist', 'topSongs', 'tipSearch', 'hotSearch'],
       },
       {
         id: 'tx',
         name: '{txName}',
-        resource: ['musicSearch', 'musicPic', 'musicLyric'],
+        resource: ['musicSearch', 'musicPic', 'musicLyric', 'songlistSearch', 'songlist', 'topSongs', 'tipSearch', 'hotSearch'],
+      },
+      {
+        id: 'mg',
+        name: '{mgName}',
+        resource: ['musicSearch', 'musicPic', 'musicLyric', 'songlistSearch', 'songlist', 'topSongs', 'tipSearch', 'hotSearch'],
       },
     ],
   },

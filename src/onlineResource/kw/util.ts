@@ -1,5 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { crypto, dataConverter } from '@/shared/hostApi'
+
 export const formatSinger = (rawData: string) => rawData.replace(/&/g, '、')
+
+export const objStr2JSON = <T>(str: string): T => {
+  return JSON.parse(str.replace(/('(?=(,\s*')))|('(?=:))|((?<=([:,]\s*))')|((?<={)')|('(?=}))/g, '"')) as T
+}
 
 interface PrevWord {
   startTime: number
@@ -47,7 +52,7 @@ export const lrcTools = {
     if (result) {
       const time = result[1]
       let words = result[2]
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
       words ??= ''
       const wordTimes = words.match(this.rxps.wordTimeAll)
       if (!wordTimes) return
@@ -67,7 +72,7 @@ export const lrcTools = {
     if (!result) return
     if (result[1] == 'kuwo') {
       let content = result[2]
-      // eslint-disable-next-line @typescript-eslint/prefer-optional-chain, @typescript-eslint/no-unnecessary-condition
+      // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
       if (content != null && content.includes('][')) {
         content = content.substring(0, content.indexOf(']['))
       }
@@ -84,7 +89,7 @@ export const lrcTools = {
   parse(lrc: string) {
     // console.log(lrc)
     const lines = lrc.split(/\r\n|\r|\n/)
-    const tools = Object.create(this)
+    const tools = Object.create(this) as typeof this
     tools.isOK = true
     tools.offset = 1
     tools.offset2 = 1
@@ -99,48 +104,31 @@ export const lrcTools = {
     let lrcs = tools.lines.join('\n')
     if (tools.tags.length) lrcs = `${tools.tags.join('\n')}\n${lrcs}`
     // console.log(lrcs)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     return lrcs
   },
 }
 
-// const createAesEncrypt = (buffer, mode, key, iv) => {
-//   const cipher = createCipheriv(mode, key, iv)
-//   return Buffer.concat([cipher.update(buffer), cipher.final()])
-// }
+export const wbdCrypto = {
+  aesKey: new Uint8Array([112, 87, 39, 61, 199, 250, 41, 191, 57, 68, 45, 114, 221, 94, 140, 228]),
+  aesIv: '',
+  appId: 'y67sprxhhpws',
+  async decodeData<T>(base64Result: string) {
+    const data = await dataConverter(decodeURIComponent(base64Result), 'base64')
+    const decrypted = await crypto.aesDecrypt('ECB_128_NoPadding', data, this.aesKey, this.aesIv, 'utf-8')
+    return JSON.parse(decrypted) as T
+  },
+  async createSign(data: string, time: number) {
+    const str = `${this.appId}${data}${time}`
+    return (await crypto.md5(str)).toUpperCase()
+  },
+  async buildParam(jsonData: Record<string, unknown>) {
+    const data = JSON.stringify(jsonData)
+    const time = Date.now()
 
-// const createAesDecrypt = (buffer, mode, key, iv) => {
-//   const cipher = createDecipheriv(mode, key, iv)
-//   return Buffer.concat([cipher.update(buffer), cipher.final()])
-// }
+    const encodeData = await crypto.aesEncrypt('ECB_128_NoPadding', data, this.aesKey, this.aesIv)
+    const sign = await this.createSign(encodeData, time)
 
-// export const wbdCrypto = {
-//   aesMode: 'aes-128-ecb',
-//   // aesKey: Buffer.from([112, 87, 39, 61, 199, 250, 41, 191, 57, 68, 45, 114, 221, 94, 140, 228], 'binary'),
-//   aesKey: 'cFcnPcf6Kb85RC1y3V6M5A==',
-//   aesIv: '',
-//   appId: 'y67sprxhhpws',
-//   decodeData(base64Result: string) {
-//     // const data = Buffer.from(decodeURIComponent(base64Result), 'base64')
-//     // return JSON.parse(createAesDecrypt(data, this.aesMode, this.aesKey, this.aesIv).toString())
-//     const data = decodeURIComponent(base64Result)
-//     return JSON.parse(aesDecryptSync(data, this.aesKey, this.aesIv, AES_MODE.ECB_128_NoPadding))
-//   },
-//   createSign(data, time) {
-//     const str = `${this.appId}${data}${time}`
-//     return toMD5(str).toUpperCase()
-//   },
-//   buildParam(jsonData) {
-//     // const data = Buffer.from(JSON.stringify(jsonData))
-//     // const time = Date.now()
-
-//     // const encodeData = createAesEncrypt(data, this.aesMode, this.aesKey, this.aesIv).toString('base64')
-//     const data = Buffer.from(JSON.stringify(jsonData)).toString('base64')
-//     const time = Date.now()
-
-//     const encodeData = aesEncryptSync(data, this.aesKey, this.aesIv, AES_MODE.ECB_128_NoPadding)
-//     const sign = this.createSign(encodeData, time)
-
-//     return `data=${encodeURIComponent(encodeData)}&time=${time}&appId=${this.appId}&sign=${sign}`
-//   },
-// }
+    return `data=${encodeURIComponent(encodeData)}&time=${time}&appId=${this.appId}&sign=${sign}`
+  },
+}

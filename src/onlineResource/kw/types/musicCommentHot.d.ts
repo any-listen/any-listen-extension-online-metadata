@@ -1,0 +1,61 @@
+export interface CommentHot {
+  code: string
+  collapsed_counts: number
+  comments: any[]
+  comments_counts: number
+  hot_comments: HotComment[]
+  hot_comments_counts: number
+  offset: number
+  result: string
+  retver: number
+  top_comments: any[]
+  top_comments_counts: number
+}
+
+export interface HotComment {
+  be_replied_commentId: string
+  bpic: string
+  broadcaster: string
+  child_comment_count?: number
+  child_comments?: HotComment[]
+  color: string
+  commentTalent: string
+  commentTalentType: string
+  id: string
+  identity_icon: string
+  isYear: string
+  is_like: string
+  kuwoMusician: string
+  like_num: string
+  md_creator_speak: string
+  medalImg: string
+  medalLevel: number
+  medalName: string
+  medalUrl: string
+  menuTalent: string
+  menuTalentType: string
+  mpic: string
+  msg: string
+  nameplateImg: string
+  parent_comment_id: string
+  rankImg: string
+  rankUrl: string
+  rankVal: number
+  singTalent: string
+  singTalentType: string
+  state: string
+  svip: string
+  time: string
+  typeface: string
+  u_hangerid: string
+  u_headframe: string
+  u_id: string
+  u_name: string
+  u_pic: string
+  videoTalentType: string
+  vip: string
+  vip2: string
+  vip3: string
+  vipIcon: string
+  reply?: HotComment
+}

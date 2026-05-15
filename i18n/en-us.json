@@ -1,11 +1,17 @@
 {
   "count_billion": "{num}",
   "count_ten_thousand": "{num} ten thousand",
-  "description": "Match online song covers, lyrics from playing songs",
+  "description": "Match online song covers and lyrics from played songs, and query public online resources on certain platforms",
   "displayName": "Online song information",
   "kgName": "KuGou",
   "kwName": "Kuwo",
+  "mgName": "Migu music",
+  "onlineResource.picNotFound": "Failed to obtain the image",
+  "songlist.sort.hot": "Hottest",
+  "songlist.sort.hot_collect": "Hot Collect",
+  "songlist.sort.new": "Latest",
+  "songlist.sort.recommend": "Recommend",
+  "songlist.sort.soaring": "Soar",
   "txName": "Tencent",
-  "wyName": "NetEase",
-  "onlineResource.picNotFound": "Failed to obtain the image"
+  "wyName": "NetEase"
 }

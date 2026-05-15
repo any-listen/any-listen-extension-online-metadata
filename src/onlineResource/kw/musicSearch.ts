@@ -94,11 +94,10 @@ export const search = async (str: string, page = 1, limit?: number): Promise<Any
   // http://newlyric.kuwo.cn/newlyric.lrc?62355680
   const result = await musicSearch(str, page, limit)
   // console.log(result)
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (!result || (result.TOTAL !== '0' && result.SHOW === '0')) return search(str, page, limit)
+  if (!result || (result.TOTAL !== '0' && result.SHOW === '0')) throw new Error('search failed')
   const list = handleResult(result.abslist)
 
-  if (list == null) return search(str, page, limit)
+  if (list == null) throw new Error('search failed')
 
   pageInfo.total = parseInt(result.TOTAL)
   pageInfo.page = page
