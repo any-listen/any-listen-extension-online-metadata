@@ -1,4 +1,4 @@
-import { request } from '@/shared/hostApi'
+import { console, request } from '@/shared/hostApi'
 import { dateFormat, formatPlayCount } from '@/shared/utils'
 
 import { getListDetail } from './songlistDetail'
@@ -8,7 +8,6 @@ import type { SonglistSearch } from './types/songlistSearch'
 import type { Tag } from './types/songlistTag'
 
 const pageInfo = {
-  maxRetryNum: 3,
   sortList: [
     { id: '5', label: 'recommend', name: '推荐' },
     { id: '6', label: 'hot', name: '最热' },
@@ -30,6 +29,12 @@ const getInfoUrl = (tagId?: string) => {
 
 const getSongListUrl = (sortId: string, tagId: string, page: number) => {
   const id = tagId || ''
+  console.log(
+    sortId,
+    tagId,
+    page,
+    `http://www2.kugou.kugou.com/yueku/v9/special/getSpecial?is_ajax=1&cdn=cdn&t=${sortId}&c=${id}&p=${page}`
+  )
   return `http://www2.kugou.kugou.com/yueku/v9/special/getSpecial?is_ajax=1&cdn=cdn&t=${sortId}&c=${id}&p=${page}`
 }
 
@@ -75,17 +80,14 @@ const filterList = (rawData: SonglistItemLike[]): AnyListen_API.SongListItem[] =
   }))
 }
 
-const getSongList = async (sortId: string, tagId: string, page: number, retryNum = 0): Promise<AnyListen_API.SongListItem[]> => {
-  if (++retryNum > pageInfo.maxRetryNum) throw new Error('kg getSongList retry max num')
-
+const getSongList = async (sortId: string, tagId: string, page: number): Promise<AnyListen_API.SongListItem[]> => {
+  console.log({ sortId, tagId, page })
   const { body, statusCode } = await request<Songlist>(getSongListUrl(sortId, tagId, page))
-  if (statusCode !== 200 || body?.status !== 1) return getSongList(sortId, tagId, page, retryNum)
+  if (statusCode !== 200 || body?.status !== 1) throw new Error('get songlist failed')
   return filterList(body.special_db)
 }
 
-const getSongListRecommend = async (retryNum = 0): Promise<AnyListen_API.SongListItem[]> => {
-  if (++retryNum > pageInfo.maxRetryNum) throw new Error('kg getSongListRecommend retry max num')
-
+const getSongListRecommend = async (): Promise<AnyListen_API.SongListItem[]> => {
   const { body, statusCode } = await request<SonglistRecommend>('http://everydayrec.service.kugou.com/guess_special_recommend', {
     method: 'POST',
     headers: {
@@ -104,25 +106,25 @@ const getSongListRecommend = async (retryNum = 0): Promise<AnyListen_API.SongLis
     },
   })
 
-  if (statusCode !== 200 || body.status !== 1) return getSongListRecommend(retryNum)
+  if (statusCode !== 200 || body.status !== 1) throw new Error('get songlist recommend failed')
   return filterList(body.data.special_list)
 }
 
-const getListInfo = async (
-  tagId: string
-): Promise<{
-  limit: number
-  page: number
-  total: number
-}> => {
+const currentListInfo = {
+  tagId: null as string | null,
+  total: 0,
+  limit: 0,
+}
+const getListInfo = async (tagId: string): Promise<{ total: number; limit: number }> => {
+  if (currentListInfo.tagId != null && currentListInfo.tagId == tagId) {
+    return { total: currentListInfo.total, limit: currentListInfo.limit }
+  }
   const { body, statusCode } = await request<Tag>(getInfoUrl(tagId))
   if (statusCode !== 200 || body.status !== 1) throw new Error('kg getListInfo failed')
-
-  return {
-    limit: body.data.params.pagesize,
-    page: body.data.params.p,
-    total: body.data.params.total,
-  }
+  currentListInfo.tagId = tagId
+  currentListInfo.total = body.data.params.total
+  currentListInfo.limit = body.data.params.pagesize
+  return { total: currentListInfo.total, limit: currentListInfo.limit }
 }
 
 export const getSorts = async (): Promise<AnyListen_API.TagItem[]> => {
@@ -149,10 +151,10 @@ export const getList = async (
 ): Promise<{
   list: AnyListen_API.SongListItem[]
   total: number
-  limit: number
   page: number
+  limit?: number
 }> => {
-  const [list, info, recommendList] = await Promise.all([
+  const [list, listInfo, recommendList] = await Promise.all([
     getSongList(sortId, tagId, page),
     getListInfo(tagId),
     !tagId && page === 1 && sortId === pageInfo.sortList[0].id ? getSongListRecommend() : Promise.resolve(null),
@@ -162,9 +164,9 @@ export const getList = async (
 
   return {
     list,
-    total: info.total,
-    limit: info.limit,
-    page: info.page,
+    total: listInfo.total,
+    limit: listInfo.limit,
+    page,
   }
 }
 
