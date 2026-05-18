@@ -1,3 +1,3 @@
 ### Fix
 
-- fix kg songlist turn page
+- fix tx songlist load

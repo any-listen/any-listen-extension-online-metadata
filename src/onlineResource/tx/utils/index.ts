@@ -5,6 +5,7 @@ import { formatPlayTime, sizeFormate } from '@/shared/utils'
 import type { TrackInfo } from '../types/musicInfo'
 import type { ItemSong } from '../types/musicSearch'
 import type { Songlist } from '../types/songlistDetail'
+import type { Songlist as Songlist2 } from '../types/songlistDetail2'
 import type { SongInfoList } from '../types/topSongsDetail'
 import { zzcSign } from './crypto'
 
@@ -22,7 +23,7 @@ export const signRequest = async <T>(data: Record<string, unknown>) => {
 }
 
 export const buildMusicList = (
-  rawList: ItemSong[] | Songlist[] | SongInfoList[] | TrackInfo[]
+  rawList: ItemSong[] | Songlist[] | SongInfoList[] | TrackInfo[] | Songlist2[]
 ): AnyListen_API.MusicInfoOnline[] => {
   // console.log(rawList)
   if (!rawList || !Array.isArray(rawList)) return []

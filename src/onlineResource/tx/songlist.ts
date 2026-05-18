@@ -5,6 +5,7 @@ import { dateFormat, decodeName, formatPlayCount } from '@/shared/utils'
 import type { Data, Songlist } from './types/songlist'
 import type { SonglistByTag } from './types/songlistByTag'
 import type { SonglistDetail } from './types/songlistDetail'
+import type { SonglistDetail2 } from './types/songlistDetail2'
 // import { formatSingerName } from '../shared'
 // import type { Songlist, SonglistDetail } from './types/songlistDetail'
 import type { SonglistSearch } from './types/songlistSearch'
@@ -185,6 +186,68 @@ const getListId = async (id: string) => {
   return id
 }
 
+const getListDetail2 = async (
+  id: string,
+  page: number,
+  limit = pageInfo.limit_song
+): Promise<{
+  list: AnyListen_API.MusicInfoOnline[]
+  total: number
+  limit: number
+  page: number
+  info: AnyListen_API.SongListDetailInfo
+}> => {
+  const { body } = await request<SonglistDetail2>('https://u.y.qq.com/cgi-bin/musicu.fcg', {
+    method: 'POST',
+    headers: {
+      Origin: 'https://y.qq.com',
+      Referer: `https://y.qq.com/n/yqq/playsquare/${id}.html`,
+    },
+    json: {
+      comm: {
+        cv: 4747474,
+        ct: 24,
+        format: 'json',
+        inCharset: 'utf-8',
+        outCharset: 'utf-8',
+        platform: 'yqq.json',
+        needNewCode: 1,
+        uin: 0,
+      },
+      req_1: {
+        module: 'music.srfDissInfo.aiDissInfo',
+        method: 'uniform_get_Dissinfo',
+        param: {
+          disstid: parseInt(id),
+          userinfo: 1,
+          tag: 1,
+          orderlist: 1,
+          song_begin: 0,
+          song_num: pageInfo.limit_song,
+          onlysonglist: 0,
+          enc_host_uin: '',
+        },
+      },
+    },
+  })
+  if (body.code !== pageInfo.successCode || body.req_1.code !== pageInfo.successCode) throw new Error('tx getListDetail failed')
+
+  const result = body.req_1.data
+  const dirinfo = result.dirinfo
+  return {
+    list: buildMusicList(result.songlist),
+    page,
+    limit,
+    total: dirinfo.songnum,
+    info: {
+      name: dirinfo.title,
+      img: dirinfo.picurl,
+      desc: decodeName(dirinfo.desc ?? '').replace(/<br>/g, '\n'),
+      author: dirinfo.host_nick,
+      play_count: formatPlayCount(dirinfo.listennum),
+    },
+  }
+}
 export const getListDetail = async (
   id: string,
   page: number,
@@ -209,6 +272,7 @@ export const getListDetail = async (
   )
 
   if (body.code !== pageInfo.successCode) throw new Error('tx getListDetail failed')
+  if (body.subcode !== pageInfo.successCode) return getListDetail2(id, page, limit)
   const cdlist = body.cdlist[0]
   return {
     list: buildMusicList(cdlist.songlist),
