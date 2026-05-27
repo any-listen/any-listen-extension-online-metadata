@@ -1,3 +1,3 @@
 ### Fix
 
-- fix kg songlist load
+- remove log output

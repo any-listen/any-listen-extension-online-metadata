@@ -1,4 +1,4 @@
-import { console, request } from '@/shared/hostApi'
+import { request } from '@/shared/hostApi'
 import { dateFormat, formatPlayCount } from '@/shared/utils'
 
 import { getMusicInfos } from './musicDetail'
@@ -111,8 +111,6 @@ const requestWithRetry = async <T extends { error_code?: number; errcode?: numbe
   }
 ): Promise<T> => {
   const { body, statusCode } = await request<T>(url, options)
-  console.log(url)
-  console.log(body)
   if (statusCode !== 200 || getErrorCode(body) !== 0) throw new Error(`kg songlistDetail request failed: ${url}`)
   return body
 }
