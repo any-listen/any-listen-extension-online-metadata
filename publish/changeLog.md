@@ -1,3 +1,3 @@
 ### Fix
 
-- fix tx songlist load
+- fix kg songlist load

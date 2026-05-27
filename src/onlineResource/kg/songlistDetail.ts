@@ -1,5 +1,5 @@
-import { request } from '@/shared/hostApi'
-import { formatPlayCount } from '@/shared/utils'
+import { console, request } from '@/shared/hostApi'
+import { dateFormat, formatPlayCount } from '@/shared/utils'
 
 import { getMusicInfos } from './musicDetail'
 import type {
@@ -9,8 +9,8 @@ import type {
   SonglistDetailCodeResponse,
   SonglistDetailDecodeGcidResponse,
   SonglistDetailShareInfoV2,
-  SonglistDetailShareSongV2,
 } from './types/songlistDetail'
+import type { SonglistDetailV2 } from './types/songlistDetailV2'
 import { signatureParams } from './utils'
 
 const pageInfo = {
@@ -111,7 +111,9 @@ const requestWithRetry = async <T extends { error_code?: number; errcode?: numbe
   }
 ): Promise<T> => {
   const { body, statusCode } = await request<T>(url, options)
-  if (statusCode !== 200 || getErrorCode(body) !== 0) throw new Error('kg songlistDetail request failed')
+  console.log(url)
+  console.log(body)
+  if (statusCode !== 200 || getErrorCode(body) !== 0) throw new Error(`kg songlistDetail request failed: ${url}`)
   return body
 }
 
@@ -135,8 +137,7 @@ const decodeGcid = async (gcid: string): Promise<string> => {
       json: payload as unknown as Record<string, unknown>,
     }
   )
-
-  const collectionId = body.list?.[0]?.global_collection_id
+  const collectionId = body.data.list?.[0]?.global_collection_id
   if (!collectionId) throw new Error('kg decodeGcid failed')
   return collectionId
 }
@@ -155,19 +156,16 @@ const createGetListDetail2Task = async (id: string, total: number): Promise<Hash
     const signature = await signatureParams(params, 'web')
 
     tasks.push(
-      requestWithRetry<SonglistDetailShareSongV2>(
-        `https://mobiles.kugou.com/api/v5/special/song_v2?${params}&signature=${signature}`,
-        {
-          headers: {
-            mid: '1586163263991',
-            Referer: 'https://m3ws.kugou.com/share/index.php',
-            'User-Agent':
-              'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
-            dfid: '-',
-            clienttime: '1586163263991',
-          },
-        }
-      ).then((resp) => resp.info ?? [])
+      requestWithRetry<SonglistDetailV2>(`https://mobiles.kugou.com/api/v5/special/song_v2?${params}&signature=${signature}`, {
+        headers: {
+          mid: '1586163263991',
+          Referer: 'https://m3ws.kugou.com/share/index.php',
+          'User-Agent':
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          dfid: '-',
+          clienttime: '1586163263991',
+        },
+      }).then((resp) => resp.data.info ?? [])
     )
   }
 
@@ -191,7 +189,7 @@ const getUserListDetail2 = async (
     '&format=jsonp&srcappid=2919&clientver=20000&clienttime=1586163242519&mid=1586163242519&uuid=1586163242519&dfid=-'
   const infoSignature = await signatureParams(infoParams, 'web')
 
-  const info = await requestWithRetry<SonglistDetailShareInfoV2>(
+  const { data: info } = await requestWithRetry<SonglistDetailShareInfoV2>(
     `https://mobiles.kugou.com/api/v5/special/info_v2?${infoParams}&signature=${infoSignature}`,
     {
       headers: {
@@ -218,6 +216,7 @@ const getUserListDetail2 = async (
       img: info.imgurl?.replace('{size}', '240') ?? '',
       desc: info.intro,
       author: info.nickname,
+      date: info.publishtime ? dateFormat(info.publishtime, 'Y-M-D') : '',
       play_count: formatPlayCount(info.playcount),
     },
   }
@@ -313,7 +312,7 @@ const getUserListDetailById = async (
 }
 
 const getUserListDetail4 = async (
-  songInfo: SonglistDetailChainTransferResponse,
+  songInfo: SonglistDetailChainTransferResponse['info'],
   chain: string,
   page: number
 ): Promise<{
@@ -357,7 +356,7 @@ const getUserListDetail3 = async (
   page: number
   info: AnyListen_API.SongListDetailInfo
 }> => {
-  const songInfo = await requestWithRetry<SonglistDetailChainTransferResponse>(
+  const { info: songInfo } = await requestWithRetry<SonglistDetailChainTransferResponse>(
     `http://m.kugou.com/schain/transfer?pagesize=${pageInfo.limitSong}&chain=${chain}&su=1&page=${page}&n=0.7928855356604456`,
     {
       headers: {
@@ -379,7 +378,7 @@ const getUserListDetail3 = async (
     limit: pageInfo.limitSong,
     total: list.length,
     info: {
-      name: songInfo.info?.name ?? '',
+      name: songInfo.info?.name ?? '未命名歌单',
       img: songInfo.info?.img ?? '',
       desc: '',
       author: songInfo.info?.username ?? '',
@@ -414,8 +413,7 @@ const getUserListDetailByCode = async (
       data: id,
     },
   })
-
-  const info = body.info
+  const info = body.data.info
   if (info.type === 2 && !info.global_collection_id && info.id) {
     return getListDetailBySpecialId(String(info.id), page)
   }
@@ -424,7 +422,7 @@ const getUserListDetailByCode = async (
     return getUserListDetail2(info.global_collection_id, page)
   }
 
-  const list = await getMusicInfos(body.list ?? [])
+  const list = await getMusicInfos(body.data.list ?? [])
   return {
     list,
     page,
@@ -467,6 +465,18 @@ const getUserListDetail = async (
   if (rawLink.includes('chain=')) {
     const chain = rawLink.replace(/^.*?chain=(\w+)(?:&.*$|#.*$|$)/, '$1')
     return getUserListDetail3(chain, page)
+  }
+  if (rawLink.includes('.html')) {
+    if (rawLink.includes('zlist.html')) {
+      rawLink = rawLink.replace(/^(.*)zlist\.html/, 'https://m3ws.kugou.com/zlist/list')
+      if (rawLink.includes('pagesize')) {
+        rawLink = rawLink.replace('pagesize=30', `pagesize=${pageInfo.limitSong}`).replace('page=1', `page=${page}`)
+      } else {
+        rawLink += `&pagesize=${pageInfo.limitSong}&page=${page}`
+      }
+    } else if (!rawLink.includes('song.html')) {
+      return getUserListDetail3(rawLink.replace(/.+\/(\w+).html(?:\?.*|&.*$|#.*$|$)/, '$1'), page)
+    }
   }
 
   const {
