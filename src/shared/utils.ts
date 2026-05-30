@@ -27,14 +27,14 @@ export const filterMusicList = <T extends AnyListen_API.MusicInfo>(list: T[]): T
   const ids = new Set<string>()
   return list.filter((s) => {
     if (!s.id || ids.has(s.id) || !s.name) return false
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     s.singer ??= ''
     ids.add(s.id)
     return true
   })
 }
 
-export const deduplicationList = <T extends AnyListen_API.MusicInfo>(list: T[]): T[] => {
+export const deduplicationList = <T extends { id: string }>(list: T[]): T[] => {
   const ids = new Set<string>()
   return list.filter((s) => {
     if (ids.has(s.id)) return false

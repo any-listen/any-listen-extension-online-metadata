@@ -152,7 +152,7 @@ export const getList = async (
   list: AnyListen_API.SongListItem[]
   total: number
   page: number
-  limit?: number
+  limit: number
 }> => {
   const [list, listInfo, recommendList] = await Promise.all([
     getSongList(sortId, tagId, page),

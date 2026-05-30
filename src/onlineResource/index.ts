@@ -147,5 +147,18 @@ export const initOnlineResource = () => {
       }
       throw new Error(`hotSearch not implemented for source ${params.source}`)
     },
+    async musicComment(params) {
+      const s = sources[params.source as Sources]
+      if ('musicComment' in s) {
+        const comment = await s.musicComment(params)
+        return {
+          limit: comment.limit,
+          list: comment.list,
+          page: comment.page,
+          total: comment.total,
+        }
+      }
+      throw new Error(`musicComment not implemented for source ${params.source}`)
+    },
   })
 }

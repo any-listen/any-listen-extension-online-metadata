@@ -137,9 +137,12 @@ export const getReplyComment = async (
   limit = 100
 ): Promise<{
   list: AnyListen_API.MusicCommentItem[]
+  total: number
+  page: number
+  limit: number
 }> => {
   const childrenid = String(musicInfo.meta.musicId)
-  const { body, statusCode } = await request<{ err_code: number; list?: AnyCommentList[] }>(
+  const { body, statusCode } = await request<MusicComment>(
     `http://comment.service.kugou.com/index.php?r=commentsv2/getReplyWithLike&code=fc4be23b4e972707f36b8a828a93ba8a&p=${page}&pagesize=${limit}&ver=1.01&clientver=8373&kugouid=687373022&need_show_image=1&appid=1001&childrenid=${childrenid}&tid=${replyId}`,
     {
       headers: {
@@ -148,8 +151,12 @@ export const getReplyComment = async (
     }
   )
   if (statusCode !== 200 || body.err_code !== 0) throw new Error('kg getReplyComment failed')
+  const total = body.count ?? 0
   return {
-    list: filterComment(body.list),
+    list: filterComment(body.list as AnyCommentList[]),
+    total,
+    page,
+    limit,
   }
 }
 
