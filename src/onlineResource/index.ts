@@ -1,4 +1,5 @@
 import { console, registerResourceAction, t } from '@/shared/hostApi'
+import { deduplicationList } from '@/shared/utils'
 
 import { type Sources, sources } from './sources'
 
@@ -25,7 +26,7 @@ export const initOnlineResource = () => {
       )
       return {
         limit: musics.limit,
-        list: musics.list,
+        list: deduplicationList(musics.list),
         page: musics.page,
         total: musics.total,
       }
