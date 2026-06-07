@@ -1,5 +1,5 @@
 import { request } from '@/shared/hostApi'
-import { dateFormat, formatPlayCount } from '@/shared/utils'
+import { dateFormat, decodeName, formatPlayCount } from '@/shared/utils'
 
 import { getMusicInfos } from './musicDetail'
 import type {
@@ -61,9 +61,9 @@ const parseDetailHtml = (html: string): SonglistDetailParsed | null => {
   return {
     hashes,
     info: {
-      name: listInfo?.[1] ?? '',
+      name: decodeName(listInfo?.[1] ?? ''),
       img: listInfo?.[2] ?? '',
-      desc: desc ?? '',
+      desc: decodeName(desc ?? ''),
       author: '',
       play_count: '',
     },

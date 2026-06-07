@@ -1,3 +1,3 @@
 ### fix
 
-- deduplication music search list
+- fix kg song list details names decode
