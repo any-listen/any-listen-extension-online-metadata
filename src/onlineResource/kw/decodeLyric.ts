@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-labels */
-import { dataConverter, iconv, zlib } from '@/shared/hostApi'
+import { dataConverter, zlib } from '@/shared/hostApi'
 
 function uint8IndexOfSequence(uint8Array: Uint8Array, sequence: Uint8Array) {
   const seqLen = sequence.length
@@ -21,14 +21,13 @@ const buf_key = new Uint8Array([121, 101, 101, 108, 105, 111, 110])
 const delimiter = new Uint8Array([13, 10, 13, 10])
 const buf_key_len = buf_key.length
 
-const decodeLyric = async (buf: Uint8Array, isGetLyricx: boolean) => {
-  if ((await dataConverter(buf.slice(0, 10), 'utf-8')) != 'tp=content') return ''
+export const decodeLyric = async (buf: Uint8Array, isGetLyricx: boolean) => {
+  if ((await dataConverter(buf.slice(0, 10), 'utf-8')).toLowerCase() != 'tp=content') return ''
   const lrcData = await zlib.inflate(buf.subarray(uint8IndexOfSequence(buf, delimiter) + 4))
-
-  if (!isGetLyricx) return iconv.decode(lrcData, 'gb18030')
+  if (!isGetLyricx) return dataConverter(lrcData, 'utf-8')
   const buf_str = await dataConverter(await dataConverter(lrcData, 'utf-8'), 'base64')
   const buf_str_len = buf_str.length
-  const output = new Uint16Array(buf_str_len)
+  const output = new Uint8Array(buf_str_len)
   let i = 0
   while (i < buf_str_len) {
     let j = 0
@@ -39,7 +38,7 @@ const decodeLyric = async (buf: Uint8Array, isGetLyricx: boolean) => {
     }
   }
 
-  return iconv.decode(output, 'gb18030')
+  return dataConverter(output, 'utf-8')
 }
 export default async (lrcBuffer: Uint8Array, isGetLyricx: boolean) => {
   const lrc = await decodeLyric(lrcBuffer, isGetLyricx)

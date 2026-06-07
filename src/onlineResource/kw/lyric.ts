@@ -1,29 +1,28 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { console, dataConverter, request } from '@/shared/hostApi'
+import { console, request } from '@/shared/hostApi'
 import { decodeName } from '@/shared/utils'
 
 import decodeLyric from './decodeLyric'
 import { lrcTools } from './util'
 
-const buf_key = new Uint8Array([121, 101, 101, 108, 105, 111, 110])
-const buf_key_len = buf_key.length
-const buildParams = async (id: string, isGetLyricx: boolean) => {
-  let params = `user=12345,web,web,web&requester=localhost&req=1&rid=MUSIC_${id}`
-  if (isGetLyricx) params += '&lrcx=1'
-  const buf_str = await dataConverter(params)
-  const buf_str_len = buf_str.length
-  const output = new Uint16Array(buf_str_len)
-  let i = 0
-  while (i < buf_str_len) {
-    let j = 0
-    while (j < buf_key_len && i < buf_str_len) {
-      output[i] = buf_key[j] ^ buf_str[i]
-      i++
-      j++
-    }
-  }
-  return dataConverter(new Uint8Array(output), 'base64')
-}
+// const buf_key = new Uint8Array([121, 101, 101, 108, 105, 111, 110])
+// const buf_key_len = buf_key.length
+// const buildParams = async (id: string, isGetLyricx: boolean) => {
+//   let params = `user=12345,web,web,web&requester=localhost&req=1&rid=MUSIC_${id}`
+//   if (isGetLyricx) params += '&lrcx=1'
+//   const buf_str = await dataConverter(params)
+//   const buf_str_len = buf_str.length
+//   const output = new Uint16Array(buf_str_len)
+//   let i = 0
+//   while (i < buf_str_len) {
+//     let j = 0
+//     while (j < buf_key_len && i < buf_str_len) {
+//       output[i] = buf_key[j] ^ buf_str[i]
+//       i++
+//       j++
+//     }
+//   }
+//   return dataConverter(new Uint8Array(output), 'base64')
+// }
 
 // console.log(buildParams('207527604', false))
 // console.log(buildParams('207527604', true))
@@ -74,7 +73,6 @@ const sortLrcArr = (arr: LrcLine[]) => {
   }
 }
 const transformLrc = (tags: string[], lrclist: LrcLine[]) => {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return `${tags.join('\n')}\n${lrclist ? lrclist.map((l) => `[${l.time}]${l.text}\n`).join('') : '暂无歌词'}`
 }
 const parseLrc = (lrc: string) => {
@@ -105,9 +103,12 @@ const parseLrc = (lrc: string) => {
 }
 export const getLyric = async (musicInfo: AnyListen_API.MusicInfo, isGetLyricx = true) => {
   // getLyric2(musicInfo)
-  const resp = await request<string>(`http://newlyric.kuwo.cn/newlyric.lrc?${await buildParams(musicInfo.id, isGetLyricx)}`, {
-    needRaw: true,
-  })
+  const resp = await request<string>(
+    `http://mlyric.kuwo.cn/mobi.s?f=web&type=lyric&lrcx=${isGetLyricx ? 1 : 0}&rid=${musicInfo.id}&encode=utf8`,
+    {
+      needRaw: true,
+    }
+  )
   if (resp.statusCode != 200) throw new Error(JSON.stringify(resp.body))
   const rawLrc = await decodeLyric(resp.raw, isGetLyricx)
   // console.log(Buffer.from(base64Data, 'base64').toString())
