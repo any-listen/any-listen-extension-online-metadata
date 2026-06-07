@@ -17,11 +17,11 @@
     "he": "^1.2.0"
   },
   "devDependencies": {
-    "@any-listen/extension-kit": "^0.1.11",
+    "@any-listen/extension-kit": "^0.1.12",
     "@types/he": "^1.2.3",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "eslint": "^9.39.4",
-    "oxfmt": "^0.52.0"
+    "oxfmt": "^0.53.0"
   },
   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }

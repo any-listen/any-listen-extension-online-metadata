@@ -10,7 +10,7 @@ const config: ExtensionConfig = {
   homepage: pkg.homepage,
   license: pkg.license,
   author: pkg.author,
-  target_engine: '1.2.0',
+  target_engine: '1.3.0',
   categories: [],
   tags: [],
   download_url_template: 'https://github.com/any-listen/any-listen-extension-online-metadata/releases/download/v{version}',
