@@ -447,6 +447,7 @@ const filterData = (rawList: TopSongsDetail['data']['info']): AnyListen_API.Musi
       meta: {
         albumName: decodeName(item.remark),
         albumId: Number(item.album_id),
+        albumAudioId: item.album_audio_id,
         source: 'kg',
         musicId: String(item.audio_id),
         qualitys,

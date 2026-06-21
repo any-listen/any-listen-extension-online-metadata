@@ -82,6 +82,7 @@ const filterData2 = (rawList: Array<PurpleDatum | null | undefined>): AnyListen_
       meta: {
         albumName: decodeName(item.album_info.album_name || ''),
         albumId: Number(item.album_info.album_id || 0),
+        albumAudioId: item.audio_info.audio_group_id,
         source: 'kg',
         musicId: audioId,
         qualitys,

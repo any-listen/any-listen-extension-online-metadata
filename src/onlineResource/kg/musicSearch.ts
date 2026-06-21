@@ -64,6 +64,7 @@ const filterData = (rawData: List | Grp): AnyListen_API.MusicInfoOnline => {
       posTime: 0,
       updateTime: 0,
       albumId: rawData.AlbumID,
+      albumAudioId: rawData.MixSongID,
       hash: rawData.FileHash,
       _interval: rawData.Duration,
     },
