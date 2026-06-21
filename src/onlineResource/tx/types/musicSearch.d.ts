@@ -3,10 +3,10 @@ export interface MusicSearch {
   ts: number
   start_ts: number
   traceid: string
-  req: Req
+  req: MusicSearchSearchCGIService
 }
 
-export interface Req {
+export interface MusicSearchSearchCGIService {
   code: number
   data: Data
 }
@@ -20,98 +20,83 @@ export interface Data {
 }
 
 export interface Body {
-  direct_group: DirectGroup
+  album: MvClass
   gedantip: Gedantip
-  head: string
-  item_album: any[]
-  item_audio: any[]
-  item_mv: any[]
-  item_song: ItemSong[]
-  item_songlist: any[]
-  multi_extern_info: MultiExternInfo
+  mv: MvClass
   qc: any[]
-  showMore: number
-  showMoreText: string
-  showMoreUrl: string
-  singer: any[]
-  subtab_infos: any[]
+  singer: MvClass
+  song: MvClass
+  songlist: MvClass
+  user: MvClass
+  zhida: MvClass
 }
 
-export interface DirectGroup {
-  extra_info: ExtraInfo
-  lateral_list: any[]
-  region: string
-  show_pattern: number
-  title: string
-  vertical_list: any[]
+export interface MvClass {
+  list: List[]
 }
 
-export interface ExtraInfo {
-  content: string
-  search_ext: string
-  tjreport: string
-}
-
-export interface Gedantip {
-  tab: number
-  tip: string
-}
-
-export interface ItemSong {
-  act: number
-  action: Record<string, number>
-  album: Album
-  author: string
-  bpm: number
-  content: string
-  custom_data: string
-  data_type: number
-  desc: string
+export interface List {
+  act?: number
+  action?: Record<string, number>
+  album?: ListAlbum
+  bpm?: number
+  content?: string
+  desc?: Desc
+  desc_hilight?: DescHilight
   docid: string
-  eq: number
-  es: string
-  file: File
-  fnote: number
-  genre: number
-  grp: ItemSong[]
-  hotness_desc: string
-  href3: string
-  id: number
-  index_album: number
-  index_cd: number
-  interval: number
-  isonly: number
-  ksong: Ksong
-  label: string
-  language: number
-  lyric: string
+  eq?: number
+  es?: string
+  file?: File
+  fnote?: number
+  genre?: number
+  grp?: Grp[]
+  hotness?: Hotness
+  href3?: string
+  id: number | string
+  index_album?: number
+  index_cd?: number
+  interval?: number
+  isonly?: number
+  ksong?: Ksong
+  label?: string
+  language?: number
+  lyric?: string
+  lyric_hilight?: string
   mid: string
-  mv: Mv
-  name: string
-  newStatus: number
-  ov: number
-  pay: Pay
-  protect: number
-  sa: number
-  search_title: string
-  singer: Singer[]
-  status: number
-  subtitle: string
-  tag: number
-  tid: number
-  time_public: string
+  mv?: Mv
+  name?: string
+  newStatus?: number
+  ov?: number
+  pay?: Pay
+  protect?: number
+  sa?: number
+  singer?: Singer[]
+  status?: number
+  subtitle?: string
+  tag?: number
+  tid?: number
+  time_public?: string
   title: string
-  title_extra: string
-  title_main: string
+  title_hilight?: string
   type: number
-  url: string
-  vec_hotness: any[]
-  version: number
-  volume: Volume
-  vs: string[]
+  url?: string
+  version?: number
+  vf?: number[]
+  vi?: number[]
+  volume?: Volume
+  vs?: string[]
+  album_list?: TrackListClass
+  custom_info?: CustomInfo
+  desciption?: string
+  jumpurl?: string
+  pic?: string
+  publish_date?: string
+  track_list?: TrackListClass
+  vid?: string
+  video_type?: number
 }
 
-export interface Album {
+export interface ListAlbum {
   id: number
   mid: string
   name: string
@@ -119,6 +104,59 @@ export interface Album {
   subtitle: string
   time_public: string
   title: string
+}
+
+export interface TrackListClass {
+  items: Item[]
+}
+
+export interface Item {
+  id: number
+  mid: string
+  name: string
+}
+
+export interface CustomInfo {
+  album_num?: string
+  begin_time: string
+  end_time: string
+  extra_desc?: string
+  from?: string
+  grade?: string
+  icon_type?: string
+  icon_type2?: string
+  icon_type2_schema?: string
+  is_follow?: string
+  low_ctr_query?: string
+  mid?: string
+  mv_num?: string
+  one_line_desc?: string
+  parent_ids: string
+  play_list?: string
+  pos?: string
+  search_history?: string
+  song_num?: string
+  source_d: string
+  tab_id?: string
+  auto_play?: string
+  duration?: string
+  is_listen?: string
+  live_pic?: string
+  pic_desc?: string
+  pic_icon?: string
+  publish_date?: Date
+  vid?: string
+  video_type?: string
+}
+
+export enum Desc {
+  Cover周杰伦 = 'cover: 周杰伦',
+  Empty = '',
+}
+
+export enum DescHilight {
+  CoverEm周杰伦Em = 'cover: <em>周杰伦</em>',
+  Empty = '',
 }
 
 export interface File {
@@ -146,6 +184,65 @@ export interface File {
   try_begin: number
   try_end: number
   url: string
+}
+
+export interface Grp {
+  act: number
+  action: Record<string, number>
+  album: ListAlbum
+  bpm: number
+  content: string
+  desc: Desc
+  desc_hilight: DescHilight
+  docid: string
+  eq: number
+  es: string
+  file: File
+  fnote: number
+  genre: number
+  grp: Grp[]
+  hotness: Hotness
+  href3: string
+  id: number
+  index_album: number
+  index_cd: number
+  interval: number
+  isonly: number
+  ksong: Ksong
+  label: string
+  language: number
+  lyric: string
+  lyric_hilight: string
+  mid: string
+  mv: Mv
+  name: string
+  newStatus: number
+  ov: number
+  pay: Pay
+  protect: number
+  sa: number
+  singer: Singer[]
+  status: number
+  subtitle: string
+  tag: number
+  tid: number
+  time_public: string
+  title: string
+  title_hilight: string
+  type: number
+  url: string
+  version: number
+  vf: number[]
+  vi: number[]
+  volume: Volume
+  vs: string[]
+}
+
+export interface Hotness {
+  desc: string
+  icon_url: string
+  jump_type: number
+  jump_url: string
 }
 
 export interface Ksong {
@@ -187,12 +284,9 @@ export interface Volume {
   peak: number
 }
 
-export interface MultiExternInfo {
-  is_show: number
-  restype: string
-  selectors: any[]
-  show_rows: number
-  style: number
+export interface Gedantip {
+  tab: number
+  tip: string
 }
 
 export interface Meta {
@@ -205,11 +299,11 @@ export interface Meta {
   expid: string
   feedbackPlaceId: string
   is_filter: number
-  next_page_start: any
+  next_page_start: unknown
   nextpage: number
   perpage: number
   query: string
-  report_info: any
+  report_info: ReportInfo
   result_trustworthy: number
   ret: number
   safetyType: number
@@ -217,9 +311,13 @@ export interface Meta {
   searchid: string
   sid: string
   sin: number
-  step_rela_syntax_tree: any
+  step_rela_syntax_tree: unknown
   sum: number
   tab_list: any[]
   uid: string
   v: number
+}
+
+export interface ReportInfo {
+  items: unknown
 }

@@ -1,7 +1,7 @@
 import { formatPlayTime, sizeFormate } from '@/shared/utils'
 
 import { formatSingerName } from '../shared'
-import type { ItemSong, MusicSearch } from './types/musicSearch'
+import type { List, MusicSearch } from './types/musicSearch'
 import { signRequest } from './utils'
 
 const pageInfo = {
@@ -12,62 +12,52 @@ const pageInfo = {
   successCode: 0,
 }
 
+const getSearchId = () => {
+  let guid = ''
+  for (let i = 0; i < 32; i++) guid += Math.floor(Math.random() * 16).toString(16)
+  return guid.toUpperCase() + String(Math.floor(Math.random() * 100000)).padStart(5, '0')
+}
 const musicSearch = async (str: string, page: number, limit: number) => {
   // searchRequest = httpFetch(`https://c.y.qq.com/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace=sizer.yqq.song_next&searchid=49252838123499591&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=${page}&n=${limit}&w=${encodeURIComponent(str)}&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0`)
   // const searchRequest = httpFetch(`https://shc.y.qq.com/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&remoteplace=txt.yqq.top&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=${page}&n=${limit}&w=${encodeURIComponent(str)}&cv=4747474&ct=24&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0&uin=0&hostUin=0&loginUin=0`)
   const { body } = await signRequest<MusicSearch>({
     comm: {
-      ct: '11',
-      cv: '14090508',
-      v: '14090508',
+      _channelid: '0',
+      _os_version: '6.2.9200-2',
+      ct: '19',
+      cv: '2151',
+      guid: '1F70E520B2EAA7D25E11760783C53CA9',
+      patch: '118',
+      psrf_access_token_expiresAt: 0,
+      psrf_qqaccess_token: '',
+      psrf_qqopenid: '',
+      psrf_qqunionid: '',
       tmeAppID: 'qqmusic',
-      phonetype: 'EBG-AN10',
-      deviceScore: '553.47',
-      devicelevel: '50',
-      newdevicelevel: '20',
-      rom: 'HuaWei/EMOTION/EmotionUI_14.2.0',
-      os_ver: '12',
-      OpenUDID: '0',
-      OpenUDID2: '0',
-      QIMEI36: '0',
-      udid: '0',
-      chid: '0',
-      aid: '0',
-      oaid: '0',
-      taid: '0',
-      tid: '0',
-      wid: '0',
-      uid: '0',
-      sid: '0',
-      modeSwitch: '6',
-      teenMode: '0',
-      ui_mode: '2',
-      nettype: '1020',
-      v4ip: '',
+      tmeLoginType: 0,
+      uin: '0',
+      wid: '7223299733393904640',
     },
     req: {
       module: 'music.search.SearchCgiService',
-      method: 'DoSearchForQQMusicMobile',
+      method: 'DoSearchForQQMusicDesktop',
       param: {
-        search_type: 0,
-        searchid: Math.random().toString().slice(2),
-        query: str,
-        page_num: page,
-        num_per_page: limit,
-        highlight: 0,
-        nqc_flag: 0,
-        multi_zhida: 0,
-        cat: 2,
         grp: 1,
-        sin: 0,
-        sem: 0,
+        num_per_page: limit,
+        page_num: page,
+        query: str,
+        remoteplace: 'txt.newclient.top',
+        search_type: 0,
+        searchid: getSearchId(),
       },
     },
   })
+  if (body.code != pageInfo.successCode || body.req?.code != pageInfo.successCode) {
+    throw new Error(`Search failed: ${body.code} ${body.req?.code}`)
+  }
   // searchRequest = httpFetch(`http://ioscdn.kugou.com/api/v3/search/song?keyword=${encodeURIComponent(str)}&page=${page}&pagesize=${this.limit}&showtype=10&plat=2&version=7910&tag=1&correct=1&privilege=1&sver=5`)
   return body.req.data
 }
-const handleResult = (rawList: ItemSong[]) => {
+const handleResult = (rawList: List[]) => {
   // console.log(rawList)
   if (!rawList || !Array.isArray(rawList)) return []
   const list: AnyListen_API.MusicInfoOnline[] = []
@@ -112,7 +102,7 @@ const handleResult = (rawList: ItemSong[]) => {
       // name: item.name + (item.title_extra ?? ''),
       name: item.title,
       singer: formatSingerName(item.singer, 'name'),
-      interval: formatPlayTime(item.interval),
+      interval: item.interval ? formatPlayTime(item.interval) : null,
       isLocal: false,
       meta: {
         albumName,
@@ -140,11 +130,10 @@ const handleResult = (rawList: ItemSong[]) => {
 }
 export const search = async (str: string, page = 1, limit?: number): Promise<AnyListen_API.MusicSearchResult> => {
   limit ??= pageInfo.limit
-  // http://newlyric.kuwo.cn/newlyric.lrc?62355680
   const { body, meta } = await musicSearch(str, page, limit)
-  const list = handleResult(body.item_song)
+  const list = handleResult(body.song.list)
 
-  pageInfo.total = meta.estimate_sum
+  pageInfo.total = meta.sum
   pageInfo.page = page
   pageInfo.allPage = Math.ceil(pageInfo.total / limit)
 

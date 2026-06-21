@@ -1,3 +1,3 @@
 ### fix
 
-- fix kg song list details names decode
+- fix tx music search

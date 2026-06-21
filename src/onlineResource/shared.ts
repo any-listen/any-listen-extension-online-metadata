@@ -9,7 +9,7 @@ export const toMD5 = async (str: string) => crypto.md5(str)
  * @param nameKey 歌手名键值
  * @param join 歌手分割字符
  */
-export const formatSingerName = <T extends any[]>(singers: T, nameKey = 'name', join = '、') => {
+export const formatSingerName = <T extends any[]>(singers?: T, nameKey = 'name', join = '、') => {
   if (Array.isArray(singers)) {
     const singer: string[] = []
     singers.forEach((item) => {
