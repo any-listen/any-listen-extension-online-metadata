@@ -49,7 +49,7 @@ const parseLyric = async (str: string) => {
   let awlyric = str.replace(/\[((\d+),\d+)\].*/g, (str) => {
     const result = /\[((\d+),\d+)\].*/.exec(str)
     let time = parseInt(result![2])
-    const ms = time % 1000
+    const ms = (time % 1000).toString().padStart(3, '0')
     time /= 1000
     const m = Math.trunc(time / 60)
       .toString()
@@ -57,9 +57,7 @@ const parseLyric = async (str: string) => {
     time %= 60
     const s = Math.trunc(time).toString().padStart(2, '0')
     const timeLabel = `${m}:${s}.${ms}`
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (rlyricRaw) rlyric[i] = `[${timeLabel}]${rlyricRaw[i]?.join('') ?? ''}`
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (tlyricRaw) tlyric[i] = `[${timeLabel}]${tlyricRaw[i]?.join('') ?? ''}`
     i++
     return str.replace(result![1], timeLabel)

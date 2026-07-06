@@ -22,7 +22,7 @@ const parseLyric = (str: string) => {
 
     const startTime = Number.parseInt(result[1], 10)
     let time = startTime
-    const ms = time % 1000
+    const ms = (time % 1000).toString().padStart(3, '0')
     time /= 1000
     const m = Number.parseInt(String(time / 60), 10)
       .toString()
@@ -39,7 +39,7 @@ const parseLyric = (str: string) => {
     const formatTimes = times.map((value) => {
       const result = /\((\d+),(\d+)\)/.exec(value)
       if (!result) return ''
-      return `<${Number.parseInt(result[1], 10) - startTime},${result[2]}>`
+      return `<${Math.trunc(parseInt(result[1], 10) - startTime)},${result[2]}>`
     })
     const wordArr = words.split(rxps.wordTime)
     const newWords = formatTimes.map((value, index) => `${value}${wordArr[index]}`).join('')
