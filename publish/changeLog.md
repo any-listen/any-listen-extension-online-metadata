@@ -1,3 +1,3 @@
 ### fix
 
-- fix tx music search
+- fix format milliseconds consistently in lyric parsing functions
