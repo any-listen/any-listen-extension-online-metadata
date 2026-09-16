@@ -1,3 +1,3 @@
-### fix
+### add
 
-- fix format milliseconds consistently in lyric parsing functions
+- add tx recommend songlist

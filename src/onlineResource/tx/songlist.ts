@@ -2,10 +2,10 @@ import { request } from '@/shared/hostApi'
 // import { dateFormat, decodeName, formatPlayCount, formatPlayTime, sizeFormate } from '@/shared/utils'
 import { dateFormat, decodeName, formatPlayCount } from '@/shared/utils'
 
-import type { Data, Songlist } from './types/songlist'
 import type { SonglistByTag } from './types/songlistByTag'
 import type { SonglistDetail } from './types/songlistDetail'
 import type { SonglistDetail2 } from './types/songlistDetail2'
+import type { SonglistRecommend } from './types/songlistRecommend'
 // import { formatSingerName } from '../shared'
 // import type { Songlist, SonglistDetail } from './types/songlistDetail'
 import type { SonglistSearch } from './types/songlistSearch'
@@ -18,14 +18,19 @@ const pageInfo = {
   successCode: 0,
   sortList: [
     {
+      label: 'recommend',
+      name: '推荐',
+      id: '-1',
+    },
+    {
       label: 'hot',
       name: '最热',
-      id: 5,
+      id: '3',
     },
     {
       label: 'new',
       name: '最新',
-      id: 2,
+      id: '2',
     },
   ],
 }
@@ -88,54 +93,54 @@ export const getTags = async (): Promise<{ tags: AnyListen_API.TagGroupItem[]; h
 }
 
 const getListUrl = (sortId: string | number, id: string | number, page: number, limit: number) => {
-  if (id) {
-    if (typeof id === 'string') id = parseInt(id)
-    return `https://u.y.qq.com/cgi-bin/musicu.fcg?loginUin=0&hostUin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=wk_v15.json&needNewCode=0&data=${encodeURIComponent(
-      JSON.stringify({
-        comm: { cv: 1602, ct: 20 },
-        playlist: {
-          method: 'get_category_content',
-          param: {
-            titleid: id,
-            caller: '0',
-            category_id: id,
-            size: limit,
-            page: page - 1,
-            use_page: 1,
-          },
-          module: 'playlist.PlayListCategoryServer',
-        },
-      })
-    )}`
-  }
+  // if (id) {
+  if (typeof id === 'string') id = parseInt(id)
   return `https://u.y.qq.com/cgi-bin/musicu.fcg?loginUin=0&hostUin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=wk_v15.json&needNewCode=0&data=${encodeURIComponent(
     JSON.stringify({
       comm: { cv: 1602, ct: 20 },
       playlist: {
-        method: 'get_playlist_by_tag',
-        param: { id: 10000000, sin: limit * (page - 1), size: limit, order: sortId, cur_page: page },
-        module: 'playlist.PlayListPlazaServer',
+        method: 'get_category_content',
+        param: {
+          titleid: id,
+          caller: '0',
+          category_id: id,
+          size: limit,
+          page: page - 1,
+          use_page: 1,
+        },
+        module: 'playlist.PlayListCategoryServer',
       },
     })
   )}`
+  // }
+  // return `https://u.y.qq.com/cgi-bin/musicu.fcg?loginUin=0&hostUin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=wk_v15.json&needNewCode=0&data=${encodeURIComponent(
+  //   JSON.stringify({
+  //     comm: { cv: 1602, ct: 20 },
+  //     playlist: {
+  //       method: 'get_playlist_by_tag',
+  //       param: { id: 10000000, sin: limit * (page - 1), size: limit, order: sortId, cur_page: page },
+  //       module: 'playlist.PlayListPlazaServer',
+  //     },
+  //   })
+  // )}`
 }
-const filterList = (data: Data): { list: AnyListen_API.SongListItem[]; total: number } => {
-  return {
-    list: data.v_playlist.map((item) => ({
-      play_count: formatPlayCount(item.access_num),
-      id: String(item.tid),
-      author: decodeName(item.creator_info.nick),
-      name: decodeName(item.title),
-      time: item.modify_time ? dateFormat(item.modify_time * 1000, 'Y-M-D') : '',
-      img: item.cover_url_medium,
-      // grade: item.favorcnt / 10,
-      total: item.song_ids?.length,
-      desc: decodeName(item.desc).replace(/<br>/g, '\n'),
-    })),
-    total: data.total,
-  }
-}
-const filterList2 = ({ content }: SonglistByTag['playlist']['data']): { list: AnyListen_API.SongListItem[]; total: number } => {
+// const filterList = (data: Data): { list: AnyListen_API.SongListItem[]; total: number } => {
+//   return {
+//     list: data.v_playlist.map((item) => ({
+//       play_count: formatPlayCount(item.access_num),
+//       id: String(item.tid),
+//       author: decodeName(item.creator_info.nick),
+//       name: decodeName(item.title),
+//       time: item.modify_time ? dateFormat(item.modify_time * 1000, 'Y-M-D') : '',
+//       img: item.cover_url_medium,
+//       // grade: item.favorcnt / 10,
+//       total: item.song_ids?.length,
+//       desc: decodeName(item.desc).replace(/<br>/g, '\n'),
+//     })),
+//     total: data.total,
+//   }
+// }
+const filterList = ({ content }: SonglistByTag['playlist']['data']): { list: AnyListen_API.SongListItem[]; total: number } => {
   // console.log(content.v_item)
   return {
     list: content.v_item.map(({ basic }) => ({
@@ -151,11 +156,55 @@ const filterList2 = ({ content }: SonglistByTag['playlist']['data']): { list: An
     total: content.total_cnt,
   }
 }
+const getRecommendList = async (
+  page: number,
+  limit = pageInfo.limit_list
+): Promise<{ list: AnyListen_API.SongListItem[]; total: number; limit: number; page: number }> => {
+  const { body } = await request<SonglistRecommend>(
+    `https://u.y.qq.com/cgi-bin/musicu.fcg?loginUin=0&hostUin=0&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=wk_v15.json&needNewCode=0&data=${encodeURIComponent(
+      JSON.stringify({
+        comm: { cv: 1602, ct: 20 },
+        playlist: {
+          module: 'music.playlist.PlaylistSquare',
+          method: 'GetRecommendWhole',
+          param: {
+            IsReqFeed: true,
+            FeedReq: {
+              From: (page - 1) * limit,
+              Size: limit,
+            },
+          },
+        },
+      })
+    )}`
+  )
+  if (body.code !== pageInfo.successCode) throw new Error('tx getRecommendList failed')
+  return {
+    list:
+      body.playlist.data.FeedRsp.List?.map(({ Playlist }) => ({
+        play_count: formatPlayCount(Playlist.basic.play_cnt),
+        id: String(Playlist.basic.tid),
+        author: decodeName(Playlist.basic.creator.nick),
+        name: decodeName(Playlist.basic.title),
+        time: Playlist.basic.modify_time ? dateFormat(Playlist.basic.modify_time * 1000, 'Y-M-D') : '',
+        img: Playlist.basic.cover.medium_url || Playlist.basic.cover.default_url,
+        total: Playlist.basic.song_cnt,
+        desc: decodeName(Playlist.basic.desc).replace(/<br>/g, '\n'),
+      })) || [],
+    total: body.playlist.data.FeedRsp.FromLimit,
+    limit,
+    page,
+  }
+}
 export const getList = async (sortId: string, tagId: string, page: number, limit = pageInfo.limit_list) => {
-  const { body } = await request<Songlist | SonglistByTag>(getListUrl(sortId, tagId, page, limit))
+  if (!tagId) {
+    if (sortId == '-1') return getRecommendList(page, limit)
+    tagId = sortId
+  }
+  const { body } = await request<SonglistByTag>(getListUrl(sortId, tagId, page, limit))
   if (body.code !== pageInfo.successCode) throw new Error('tx getList failed')
   return {
-    ...(tagId ? filterList2((body as SonglistByTag).playlist.data) : filterList((body as Songlist).playlist.data)),
+    ...filterList(body.playlist.data),
     limit,
     page,
   }
