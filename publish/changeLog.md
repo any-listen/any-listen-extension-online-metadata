@@ -1,3 +1,3 @@
-### add
+### fix
 
-- add tx recommend songlist
+- fix kg songlist load

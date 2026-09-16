@@ -11,6 +11,7 @@ import type {
   SonglistDetailShareInfoV2,
 } from './types/songlistDetail'
 import type { SonglistDetailV2 } from './types/songlistDetailV2'
+import type { SonglistDetailV3 } from './types/songlistDetailV3'
 import { signatureParams } from './utils'
 
 const pageInfo = {
@@ -168,6 +169,64 @@ const createGetListDetail2Task = async (id: string, total: number): Promise<Hash
   }
 
   return Promise.all(tasks).then((datas) => datas.flat())
+}
+
+const getListDetailByGcidChain = async (id: string, chain: string) => {
+  const LIMIT = 50
+  const params =
+    'srcappid=2919&clientver=20000&clienttime=1789566751657&mid=1789566751657&uuid=1789566751657&dfid=-&listid=15&type=0' +
+    `&pagesize=${LIMIT}&global_collection_id=${id}&page=1&share_type=collect&appid=1058&chain=${chain}`
+  const signature = await signatureParams(params, 'web')
+  const data = await requestWithRetry<SonglistDetailV3>(`https://m3ws.kugou.com/v2/zlist/list?${params}&signature=${signature}`, {
+    headers: {
+      mid: '1586163263991',
+      Referer: 'https://m3ws.kugou.com/share/index.php',
+      'User-Agent':
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+      dfid: '-',
+      clienttime: '1586163263991',
+    },
+  })
+  const info = data.info[0]
+  if (!info) throw new Error('get list error')
+  let tasks = [Promise.resolve(data.list.info)]
+  let page = 1
+  let totalPage = Math.ceil(info.count / LIMIT)
+  while (page < totalPage) {
+    page += 1
+    const params =
+      'srcappid=2919&clientver=20000&clienttime=1789566751657&mid=1789566751657&uuid=1789566751657&dfid=-&listid=15&type=0' +
+      `&pagesize=${LIMIT}&global_collection_id=${id}&page=${page}&share_type=collect&appid=1058&chain=${chain}`
+    const signature = await signatureParams(params, 'web')
+    tasks.push(
+      requestWithRetry<SonglistDetailV3>(`https://m3ws.kugou.com/v2/zlist/list?${params}&signature=${signature}`, {
+        headers: {
+          mid: '1586163263991',
+          Referer: 'https://m3ws.kugou.com/share/index.php',
+          'User-Agent':
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+          dfid: '-',
+          clienttime: '1586163263991',
+        },
+      }).then((resp) => resp.list.info ?? [])
+    )
+  }
+  const hashs = await Promise.all(tasks).then(([...datas]) => datas.flat())
+  let list = await getMusicInfos(hashs)
+  return {
+    list,
+    page: 1,
+    limit: list.length,
+    total: info.count,
+    source: 'kg',
+    info: {
+      name: info.name,
+      img: info.pic?.replace('{size}', '240'),
+      desc: info.intro,
+      author: info.list_create_username,
+      // play_count: formatPlayCount(info.playcount),
+    },
+  }
 }
 
 const getUserListDetail2 = async (
@@ -365,7 +424,11 @@ const getUserListDetail3 = async (
   )
 
   if (!songInfo.list?.length) {
-    if (songInfo.global_collection_id) return getUserListDetail2(songInfo.global_collection_id, page)
+    if (songInfo.global_collection_id) {
+      return getListDetailByGcidChain(songInfo.global_collection_id, chain).catch(async () =>
+        getUserListDetail2(songInfo.global_collection_id, page)
+      )
+    }
     return getUserListDetail4(songInfo, chain, page).catch(async () => getUserListDetail5(chain, page))
   }
 
@@ -449,9 +512,11 @@ const getUserListDetail = async (
   let rawLink = link
   if (rawLink.includes('#')) rawLink = rawLink.replace(/#.*$/, '')
 
-  if (rawLink.includes('global_collection_id')) {
-    const globalCollectionId = rawLink.replace(/^.*?global_collection_id=(\w+)(?:&.*$|#.*$|$)/, '$1')
-    return getUserListDetail2(globalCollectionId, page)
+  if (rawLink.includes('global_collection_id') && rawLink.includes('chain')) {
+    return getListDetailByGcidChain(
+      rawLink.replace(/^.*?global_collection_id=(\w+)(?:&.*$|#.*$|$)/, '$1'),
+      rawLink.replace(/^.*?chain=(\w+)(?:&.*$|#.*$|$)/, '$1')
+    )
   }
 
   const gcidInLink = /gcid_\w+/.exec(rawLink)?.[0]
@@ -475,6 +540,11 @@ const getUserListDetail = async (
     } else if (!rawLink.includes('song.html')) {
       return getUserListDetail3(rawLink.replace(/.+\/(\w+).html(?:\?.*|&.*$|#.*$|$)/, '$1'), page)
     }
+  }
+
+  if (rawLink.includes('global_collection_id')) {
+    const globalCollectionId = rawLink.replace(/^.*?global_collection_id=(\w+)(?:&.*$|#.*$|$)/, '$1')
+    return getUserListDetail2(globalCollectionId, page)
   }
 
   const {
