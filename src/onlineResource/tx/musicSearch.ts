@@ -98,7 +98,7 @@ const handleResult = (rawList: List[]) => {
       albumId = item.album.mid
     }
     list.push({
-      id: String(item.mid),
+      id: `tx_${String(item.mid)}`,
       // name: item.name + (item.title_extra ?? ''),
       name: item.title,
       singer: formatSingerName(item.singer, 'name'),

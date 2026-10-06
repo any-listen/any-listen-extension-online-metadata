@@ -439,7 +439,7 @@ const filterData = (rawList: TopSongsDetail['data']['info']): AnyListen_API.Musi
     if (qualityHiRes) qualitys.flac24bit = qualityHiRes
 
     return {
-      id: String(item.audio_id),
+      id: `kg_${String(item.audio_id)}_${item.hash}`,
       name: decodeName(item.songname),
       singer: decodeName(formatSingerName(item.authors, 'author_name')),
       interval: formatPlayTime(item.duration),

@@ -59,7 +59,7 @@ export const buildMusicInfoList = (rawList: ObjectInfo[] | Resource[]): AnyListe
     const img = item.albumImgs?.length ? item.albumImgs[0].img : null
 
     list.push({
-      id: item.songId,
+      id: `mg_${item.songId}`,
       singer: formatSingerName(item.artists, 'name'),
       name: item.songName,
       interval,
@@ -118,7 +118,7 @@ export const buildMusicInfoListV5 = (rawList: SongList[] | SongResultDataResultL
     const img = normalizeMiguImg(item.img3 || item.img2 || item.img1 || null)
 
     list.push({
-      id: item.songId,
+      id: `mg_${item.songId}`,
       singer: formatSingerName(item.singerList, 'name'),
       name: item.songName,
       interval: formatPlayTime(item.duration),

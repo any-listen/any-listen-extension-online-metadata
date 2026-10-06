@@ -20,7 +20,7 @@ const filterListDetail = (rawList: Musiclist[], albumName: string, albumId: numb
 
     const duration = parseInt(item.duration)
     return {
-      id: item.id,
+      id: `kw_${item.id}`,
       name: decodeName(item.name),
       singer: formatSinger(decodeName(item.artist)),
       interval: Number.isNaN(duration) ? null : formatPlayTime(duration),

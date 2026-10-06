@@ -37,7 +37,7 @@ const filterBDListDetail = (rawList: BDListItem[]): AnyListen_API.MusicInfoOnlin
     }
 
     return {
-      id: String(item.id),
+      id: `kw_${String(item.id)}`,
       name: item.name,
       singer: item.artists.map((s) => s.name).join('、'),
       interval: formatPlayTime(item.duration),

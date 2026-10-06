@@ -113,7 +113,7 @@ export const buildMusicList = (rawList: Resource[]): AnyListen_API.MusicInfoOnli
     if (item.al.picUrl) item.al.picUrl += `${item.al.picUrl.includes('?') ? '&' : '?'}param=500y500`
 
     return {
-      id: String(item.id),
+      id: `wy_${String(item.id)}`,
       name: item.name,
       singer: formatSingerName(item.ar, 'name'),
       interval: formatPlayTime(item.dt / 1000),
@@ -185,7 +185,7 @@ export const buildMusicList2 = ({ songs, privileges }: Detail): AnyListen_API.Mu
     if (item.al.picUrl) item.al.picUrl += `${item.al.picUrl.includes('?') ? '&' : '?'}param=500y500`
 
     list.push({
-      id: String(item.id),
+      id: `wy_${String(item.id)}`,
       name: item.name,
       singer: formatSingerName(item.ar, 'name'),
       interval: formatPlayTime(item.dt / 1000),

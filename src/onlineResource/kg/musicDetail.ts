@@ -74,7 +74,7 @@ const filterData2 = (rawList: Array<PurpleDatum | null | undefined>): AnyListen_
     const intervalSecond = Number.isFinite(timelength) ? timelength / 1000 : 0
 
     list.push({
-      id: audioId,
+      id: `kg_${audioId}_${item.audio_info.hash}`,
       name: decodeName(item.songname || item.ori_audio_name || ''),
       singer: decodeName(item.author_name || ''),
       interval: formatPlayTime(intervalSecond),

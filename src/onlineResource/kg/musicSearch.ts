@@ -50,7 +50,7 @@ const filterData = (rawData: List | Grp): AnyListen_API.MusicInfoOnline => {
     }
   }
   return {
-    id: String(rawData.Audioid),
+    id: `kg_${String(rawData.Audioid)}_${rawData.FileHash}`,
     name: decodeName(`${rawData.OriSongName}${rawData.Suffix ? ` ${rawData.Suffix}` : ''}`),
     singer: decodeName(formatSingerName(rawData.Singers, 'name')),
     interval: formatPlayTime(rawData.Duration),

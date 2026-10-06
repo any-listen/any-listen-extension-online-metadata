@@ -3,7 +3,7 @@ import { request } from '@/shared/hostApi'
 import { formatPlayTime, sizeFormate } from '@/shared/utils'
 
 import type { TrackInfo } from '../types/musicInfo'
-import type { ItemSong } from '../types/musicSearch'
+import type { List } from '../types/musicSearch'
 import type { Songlist } from '../types/songlistDetail'
 import type { Songlist as Songlist2 } from '../types/songlistDetail2'
 import type { SongInfoList } from '../types/topSongsDetail'
@@ -23,7 +23,7 @@ export const signRequest = async <T>(data: Record<string, unknown>) => {
 }
 
 export const buildMusicList = (
-  rawList: ItemSong[] | Songlist[] | SongInfoList[] | TrackInfo[] | Songlist2[]
+  rawList: List[] | Songlist[] | SongInfoList[] | TrackInfo[] | Songlist2[]
 ): AnyListen_API.MusicInfoOnline[] => {
   // console.log(rawList)
   if (!rawList || !Array.isArray(rawList)) return []
@@ -65,11 +65,11 @@ export const buildMusicList = (
       albumId = item.album.mid
     }
     list.push({
-      id: String(item.mid),
+      id: `tx_${String(item.mid)}`,
       // name: item.name + (item.title_extra ?? ''),
       name: item.title,
       singer: formatSingerName(item.singer, 'name'),
-      interval: formatPlayTime(item.interval),
+      interval: item.interval ? formatPlayTime(item.interval) : null,
       isLocal: false,
       meta: {
         albumName,

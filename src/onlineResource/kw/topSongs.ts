@@ -228,7 +228,7 @@ const filterData = (rawList: Musiclist[]): AnyListen_API.MusicInfoOnline[] => {
     }
 
     return {
-      id: String(item.id),
+      id: `kw_${String(item.id)}`,
       name: decodeName(item.name),
       singer: formatSinger(decodeName(item.artist)),
       interval: formatPlayTime(item.duration),

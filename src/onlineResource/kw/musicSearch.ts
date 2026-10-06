@@ -68,7 +68,7 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
     const interval = parseInt(info.DURATION)
 
     result.push({
-      id: String(songId),
+      id: `kw_${String(songId)}`,
       name: decodeName(info.SONGNAME),
       singer: formatSinger(decodeName(info.ARTIST)),
       interval: Number.isNaN(interval) ? null : formatPlayTime(interval),
