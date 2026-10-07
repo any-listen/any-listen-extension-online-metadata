@@ -84,9 +84,22 @@ export const buildMusicList = (rawList: Resource[]): AnyListen_API.MusicInfoOnli
     const types: AnyListen_API.MusicInfoOnline['meta']['qualitys'] = {}
     let size
 
-    if (item.privilege.maxBrLevel == 'hires') {
+    const maxBrLevel = item.privilege.maxBrLevel
+    if (maxBrLevel == 'hires' || maxBrLevel == 'jymaster') {
       size = item.hr ? sizeFormate(item.hr.size) : null
       types.flac24bit = {
+        sizeStr: size,
+      }
+    }
+    if (maxBrLevel == 'jymaster') {
+      size = item.master ? sizeFormate(item.master.size) : null
+      types.master = {
+        sizeStr: size,
+      }
+    }
+    if (maxBrLevel == 'dolby') {
+      size = item.dolby ? sizeFormate(item.dolby.size) : null
+      types.dolby = {
         sizeStr: size,
       }
     }
@@ -156,9 +169,22 @@ export const buildMusicList2 = ({ songs, privileges }: Detail): AnyListen_API.Mu
 
     let size: string | null
     const qualitys: AnyListen_API.MusicInfoOnline['meta']['qualitys'] = {}
-    if (privilege.maxBrLevel == 'hires') {
+    const maxBrLevel = privilege.maxBrLevel
+    if (maxBrLevel == 'hires' || maxBrLevel == 'jymaster') {
       size = item.hr ? sizeFormate(item.hr.size) : null
       qualitys.flac24bit = {
+        sizeStr: size,
+      }
+    }
+    if (maxBrLevel == 'jymaster') {
+      size = item.master ? sizeFormate(item.master.size) : null
+      qualitys.master = {
+        sizeStr: size,
+      }
+    }
+    if (maxBrLevel == 'dolby') {
+      size = item.dolby ? sizeFormate(item.dolby.size) : null
+      qualitys.dolby = {
         sizeStr: size,
       }
     }

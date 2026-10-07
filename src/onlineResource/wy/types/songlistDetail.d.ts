@@ -156,6 +156,8 @@ export interface Track {
   l: H
   sq: H
   hr: H | null
+  master: H | null
+  dolby: H | null
   a: null
   cd: string
   no: number
@@ -274,7 +276,7 @@ export enum LLevel {
   None = 'none',
 }
 
-export type MaxBrLevel = 'hires' | 'lossless'
+export type MaxBrLevel = 'hires' | 'lossless' | 'jymaster' | 'dolby'
 
 export interface FreeTrialPrivilege {
   resConsumable: boolean

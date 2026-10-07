@@ -21,6 +21,9 @@ const filterBDListDetail = (rawList: BDListItem[]): AnyListen_API.MusicInfoOnlin
     for (const audio of item.audios) {
       const size = audio.size?.toLocaleUpperCase()
       switch (audio.bitrate) {
+        case '20900':
+          qualitys.master = { sizeStr: size ?? null }
+          break
         case '4000':
           qualitys.flac24bit = { sizeStr: size ?? null }
           break
