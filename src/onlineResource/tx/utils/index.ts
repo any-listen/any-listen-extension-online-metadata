@@ -57,6 +57,12 @@ export const buildMusicList = (
         sizeStr: size,
       }
     }
+    if (file.size_new[0] !== 0) {
+      const size = sizeFormate(file.size_new[0])
+      types.master = {
+        sizeStr: size,
+      }
+    }
     // types.reverse()
     let albumId = ''
     let albumName = ''

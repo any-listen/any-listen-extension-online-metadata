@@ -167,6 +167,8 @@ export interface Track {
   l: L
   sq: L | null
   hr: L | null
+  master: L | null
+  dolby: L | null
   a: null
   cd: string
   no: number
@@ -288,6 +290,8 @@ export enum Level {
   Lossless = 'lossless',
   None = 'none',
   Standard = 'standard',
+  Jymaster = 'jymaster',
+  Dolby = 'dolby',
 }
 
 export interface FreeTrialPrivilege {
