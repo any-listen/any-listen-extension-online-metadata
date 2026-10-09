@@ -75,8 +75,6 @@ export interface SimpleSongData {
   l: L
   sq: L | null
   hr: L | null
-  master: L | null
-  dolby: L | null
   a: null
   cd: string
   no: number
@@ -196,7 +194,7 @@ export enum LLevel {
   None = 'none',
 }
 
-export type MaxBrLevel = 'exhigh' | 'higher' | 'hires' | 'lossless' | 'none' | 'jymaster' | 'dolby'
+export type MaxBrLevel = 'exhigh' | 'higher' | 'hires' | 'lossless' | 'none'
 
 export interface FreeTrialPrivilege {
   resConsumable: boolean

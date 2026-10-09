@@ -47,7 +47,7 @@ export interface ChargeInfoList {
   chargeType: number
 }
 
-export type Level = 'exhigh' | 'hires' | 'lossless' | 'none' | 'standard' | 'jymaster' | 'dolby'
+export type Level = 'exhigh' | 'hires' | 'lossless' | 'none' | 'standard'
 
 export interface FreeTrialPrivilege {
   resConsumable: boolean
@@ -81,8 +81,6 @@ export interface Song {
   l: L
   sq: L | null
   hr: L | null
-  master: L | null
-  dolby: L | null
   a: null
   cd: string
   no: number
