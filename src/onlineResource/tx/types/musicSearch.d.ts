@@ -37,12 +37,12 @@ export interface MvClass {
 
 export interface List {
   act?: number
-  action?: Record<string, number>
+  action?: Action
   album?: ListAlbum
   bpm?: number
   content?: string
-  desc?: Desc
-  desc_hilight?: DescHilight
+  desc?: string
+  desc_hilight?: string
   docid: string
   eq?: number
   es?: string
@@ -96,6 +96,20 @@ export interface List {
   video_type?: number
 }
 
+export interface Action {
+  alert: number
+  icon2: number
+  icons: number
+  msgdown: number
+  msgfav: number
+  msgid: number
+  msgpay: number
+  msgshare: number
+  switch: number
+  switch2: number
+  vb: number[]
+}
+
 export interface ListAlbum {
   id: number
   mid: string
@@ -117,50 +131,37 @@ export interface Item {
 }
 
 export interface CustomInfo {
-  album_num?: string
+  album_num: string
   begin_time: string
+  bold_description: string
+  bold_extra_desc: string
+  cutout_singer_pic: string
   end_time: string
-  extra_desc?: string
-  from?: string
-  grade?: string
-  icon_type?: string
-  icon_type2?: string
-  icon_type2_schema?: string
-  is_follow?: string
-  low_ctr_query?: string
-  mid?: string
-  mv_num?: string
-  one_line_desc?: string
+  extra_desc: string
+  from: string
+  grade: string
+  icon_type: string
+  icon_type2: string
+  icon_type2_schema: string
+  is_follow: string
+  low_ctr_query: string
+  mid: string
+  mv_num: string
+  need_blur_bg: string
+  one_line_desc: string
   parent_ids: string
-  play_list?: string
-  pos?: string
-  search_history?: string
-  song_num?: string
+  play_list: string
+  pos: string
+  search_history: string
+  singer_identity: string
+  song_num: string
   source_d: string
-  tab_id?: string
-  auto_play?: string
-  duration?: string
-  is_listen?: string
-  live_pic?: string
-  pic_desc?: string
-  pic_icon?: string
-  publish_date?: Date
-  vid?: string
-  video_type?: string
-}
-
-export enum Desc {
-  Cover周杰伦 = 'cover: 周杰伦',
-  Empty = '',
-}
-
-export enum DescHilight {
-  CoverEm周杰伦Em = 'cover: <em>周杰伦</em>',
-  Empty = '',
+  tab_id: string
 }
 
 export interface File {
   b_30s: number
+  df: any[]
   e_30s: number
   hires_bitdepth: number
   hires_sample: number
@@ -184,16 +185,17 @@ export interface File {
   try_begin: number
   try_end: number
   url: string
+  vm: any[]
 }
 
 export interface Grp {
   act: number
-  action: Record<string, number>
+  action: Action
   album: ListAlbum
   bpm: number
   content: string
-  desc: Desc
-  desc_hilight: DescHilight
+  desc: string
+  desc_hilight: string
   docid: string
   eq: number
   es: string
@@ -243,6 +245,7 @@ export interface Hotness {
   icon_url: string
   jump_type: number
   jump_url: string
+  tag_id: string
 }
 
 export interface Ksong {
@@ -299,7 +302,7 @@ export interface Meta {
   expid: string
   feedbackPlaceId: string
   is_filter: number
-  next_page_start: unknown
+  next_page_start: any
   nextpage: number
   perpage: number
   query: string
@@ -311,7 +314,7 @@ export interface Meta {
   searchid: string
   sid: string
   sin: number
-  step_rela_syntax_tree: unknown
+  step_rela_syntax_tree: any
   sum: number
   tab_list: any[]
   uid: string
@@ -319,5 +322,5 @@ export interface Meta {
 }
 
 export interface ReportInfo {
-  items: unknown
+  items: any
 }
