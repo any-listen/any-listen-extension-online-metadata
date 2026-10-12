@@ -57,7 +57,7 @@ export const buildMusicList = (
         sizeStr: size,
       }
     }
-    if (file.size_new[0] !== 0) {
+    if ('size_new' in file && file.size_new?.[0]) {
       const size = sizeFormate(file.size_new[0])
       types.master = {
         sizeStr: size,

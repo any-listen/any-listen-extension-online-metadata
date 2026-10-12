@@ -127,7 +127,6 @@ export interface File {
   size_flac: number
   size_dts: number
   size_hires: number
-  size_new: number[]
 }
 
 export interface Ksong {
