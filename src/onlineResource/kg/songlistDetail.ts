@@ -10,7 +10,7 @@ import type {
   SonglistDetailDecodeGcidResponse,
   SonglistDetailShareInfoV2,
 } from './types/songlistDetail'
-import type { SonglistDetailV2 } from './types/songlistDetailV2'
+import type { SonglistDetail2 } from './types/songlistDetail2'
 import type { SonglistDetailV3 } from './types/songlistDetailV3'
 import { signatureParams } from './utils'
 
@@ -141,31 +141,24 @@ const decodeGcid = async (gcid: string): Promise<string> => {
   return collectionId
 }
 
+const getListDetailByGcid = async (id: string, page: number, limit: number) => {
+  const params = `specialid=0&need_sort=1&module=CloudMusic&clientver=11409&pagesize=${limit}&global_collection_id=${id}&userid=0&page=${page}&type=1&area_code=1&appid=1005`
+  const signature = await signatureParams(params)
+  const result = await requestWithRetry<SonglistDetail2>(
+    `http://pubsongscdn.tx.kugou.com/v2/get_other_list_file?${params}&signature=${signature}`
+  )
+  return result.data.info
+}
+
 const createGetListDetail2Task = async (id: string, total: number): Promise<HashItem[]> => {
   const tasks: Array<Promise<HashItem[]>> = []
   let page = 0
+  const limit = total > 300 ? 300 : total
 
   while (total > 0) {
-    const limit = total > 300 ? 300 : total
     total -= limit
     page += 1
-    const params =
-      `appid=1058&global_specialid=${id}&specialid=0&plat=0&version=8000&page=${page}` +
-      `&pagesize=${limit}&srcappid=2919&clientver=20000&clienttime=1586163263991&mid=1586163263991&uuid=1586163263991&dfid=-`
-    const signature = await signatureParams(params, 'web')
-
-    tasks.push(
-      requestWithRetry<SonglistDetailV2>(`https://mobiles.kugou.com/api/v5/special/song_v2?${params}&signature=${signature}`, {
-        headers: {
-          mid: '1586163263991',
-          Referer: 'https://m3ws.kugou.com/share/index.php',
-          'User-Agent':
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
-          dfid: '-',
-          clienttime: '1586163263991',
-        },
-      }).then((resp) => resp.data.info ?? [])
-    )
+    tasks.push(getListDetailByGcid(id, page, limit))
   }
 
   return Promise.all(tasks).then((datas) => datas.flat())

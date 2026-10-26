@@ -1,3 +1,3 @@
 ### fix
 
-- update song id format
+- fix kg songlist load
