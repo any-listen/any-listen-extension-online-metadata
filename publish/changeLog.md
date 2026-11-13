@@ -1,3 +1,3 @@
 ### fix
 
-- fix kg songlist load
+- fix kg search result filter
