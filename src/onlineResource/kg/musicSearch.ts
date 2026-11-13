@@ -81,7 +81,7 @@ const handleResult = (rawData: List[]) => {
     list.push(filterData(item))
 
     for (const childItem of item?.Grp ?? []) {
-      const key = item.Audioid + item.FileHash
+      const key = childItem.Audioid + childItem.FileHash
       if (ids.has(key)) continue
       ids.add(key)
       list.push(filterData(childItem))
