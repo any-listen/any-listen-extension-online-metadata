@@ -1,7 +1,22 @@
 import { console, registerResourceAction, t } from '@/shared/hostApi'
+import { simplifyChinese } from '@/shared/simplifyChinese'
 import { deduplicationList } from '@/shared/utils'
 
 import { type Sources, sources } from './sources'
+
+// 部分音源的搜索接口不识别繁体关键词（如酷我），统一将关键词转为简体后搜索；
+// 转换为简体后无结果时回退原文再试一次（如「著/瞭」等多义字）
+const searchWithSimplify = async <T extends { list: unknown[] }>(
+  keyword: string,
+  search: (kw: string) => Promise<T>
+): Promise<T> => {
+  const simplifiedKeyword = simplifyChinese(keyword)
+  const result = await search(simplifiedKeyword)
+  if (simplifiedKeyword !== keyword && !result.list.length) {
+    return search(keyword)
+  }
+  return result
+}
 
 export const initOnlineResource = () => {
   registerResourceAction({
@@ -19,10 +34,9 @@ export const initOnlineResource = () => {
     //   }
     // },
     async musicSearch(params) {
-      const musics = await sources[params.source as Sources].musicSearch(
-        `${params.name} ${params.artist || ''} ${params.albumName || ''}`.trim(),
-        params.page,
-        params.limit
+      const keyword = `${params.name} ${params.artist || ''} ${params.albumName || ''}`.trim()
+      const musics = await searchWithSimplify(keyword, async (kw) =>
+        sources[params.source as Sources].musicSearch(kw, params.page, params.limit)
       )
       return {
         limit: musics.limit,
@@ -55,7 +69,7 @@ export const initOnlineResource = () => {
     async songlistSearch(params) {
       const s = sources[params.source as Sources]
       if ('songlistSearch' in s) {
-        const songlist = await s.songlistSearch(params.keyword, params.page, params.limit)
+        const songlist = await searchWithSimplify(params.keyword, async (kw) => s.songlistSearch(kw, params.page, params.limit))
         return {
           limit: songlist.limit,
           list: songlist.list,
@@ -137,7 +151,7 @@ export const initOnlineResource = () => {
     async tipSearch(params) {
       const s = sources[params.source as Sources]
       if ('tipSearch' in s) {
-        return s.tipSearch(params.keyword)
+        return s.tipSearch(simplifyChinese(params.keyword))
       }
       throw new Error(`tipSearch not implemented for source ${params.source}`)
     },
