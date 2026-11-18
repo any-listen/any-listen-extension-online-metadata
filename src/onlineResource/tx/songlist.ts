@@ -271,8 +271,8 @@ const getListDetail2 = async (
           userinfo: 1,
           tag: 1,
           orderlist: 1,
-          song_begin: 0,
-          song_num: pageInfo.limit_song,
+          song_begin: (page - 1) * limit,
+          song_num: limit,
           onlysonglist: 0,
           enc_host_uin: '',
         },
@@ -297,7 +297,7 @@ const getListDetail2 = async (
     },
   }
 }
-export const getListDetail = async (
+const getListDetailOld = async (
   id: string,
   page: number,
   limit = pageInfo.limit_song
@@ -308,8 +308,6 @@ export const getListDetail = async (
   page: number
   info: AnyListen_API.SongListDetailInfo
 }> => {
-  id = await getListId(id)
-
   const { body } = await request<SonglistDetail>(
     `https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg?type=1&json=1&utf8=1&onlysong=0&new_format=1&disstid=${id}&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0`,
     {
@@ -320,8 +318,7 @@ export const getListDetail = async (
     }
   )
 
-  if (body.code !== pageInfo.successCode) throw new Error('tx getListDetail failed')
-  if (body.subcode !== pageInfo.successCode) return getListDetail2(id, page, limit)
+  if (body.code !== pageInfo.successCode || body.subcode !== pageInfo.successCode) throw new Error('tx getListDetail failed')
   const cdlist = body.cdlist[0]
   return {
     list: buildMusicList(cdlist.songlist),
@@ -335,6 +332,25 @@ export const getListDetail = async (
       author: decodeName(cdlist.nickname),
       play_count: formatPlayCount(cdlist.visitnum),
     },
+  }
+}
+export const getListDetail = async (
+  id: string,
+  page: number,
+  limit = pageInfo.limit_song
+): Promise<{
+  list: AnyListen_API.MusicInfoOnline[]
+  total: number
+  limit: number
+  page: number
+  info: AnyListen_API.SongListDetailInfo
+}> => {
+  const listId = await getListId(id)
+  // 新接口返回完整音质字段（含 size_new），且支持分页，优先使用；失败时回退旧接口
+  try {
+    return await getListDetail2(listId, page, limit)
+  } catch {
+    return getListDetailOld(listId, page, limit)
   }
 }
 

@@ -41,6 +41,11 @@ const handleResult = (rawData?: SearchResult['abslist']) => {
       const result = regExps.mInfo.exec(info)
       if (result) {
         switch (result[2]) {
+          case '20900':
+            types.master = {
+              sizeStr: result[4].toLocaleUpperCase(),
+            }
+            break
           case '4000':
             types.flac24bit = {
               sizeStr: result[4].toLocaleUpperCase(),

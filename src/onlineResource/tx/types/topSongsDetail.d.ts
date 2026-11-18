@@ -175,6 +175,7 @@ export interface File {
   try_end: number
   url: string
   size_hires: number
+  size_new: number[]
   hires_sample: number
   hires_bitdepth: number
   b_30s: number

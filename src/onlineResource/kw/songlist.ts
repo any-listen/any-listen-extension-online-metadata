@@ -166,6 +166,9 @@ const filterListDetail = (rawList: SonglistDetailDigest8['musiclist']): AnyListe
       const result = regExps.mInfo.exec(info)
       if (result) {
         switch (result[2]) {
+          case '20900':
+            qualitys.master = { sizeStr: result[4].toLocaleUpperCase() }
+            break
           case '4000':
             qualitys.flac24bit = { sizeStr: result[4].toLocaleUpperCase() }
             break
