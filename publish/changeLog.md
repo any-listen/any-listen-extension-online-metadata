@@ -1,3 +1,3 @@
 ### fix
 
-- fix kg search result filter
+- fix wy songlist detail load

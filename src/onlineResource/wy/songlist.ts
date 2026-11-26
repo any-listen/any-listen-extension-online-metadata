@@ -7,7 +7,7 @@ import type { SonglistDetail } from './types/songlistDetail'
 import type { HotTag } from './types/songlistHotTag'
 import type { SonglistSearch } from './types/songlistSearch'
 import type { Tag } from './types/songlistTag'
-import { buildMusicList2, eapiRequest, linuxapiRequest, weapiRequest } from './utils'
+import { buildMusicList2, eapiRequest, weapiRequest } from './utils'
 
 const pageInfo = {
   limit_list: 30,
@@ -184,15 +184,15 @@ export const getListDetail = async (
 }> => {
   const { id, cookie } = await getListId(rawId)
 
-  const { body, statusCode } = await linuxapiRequest<SonglistDetail>(cookie || pageInfo.cookie, {
-    method: 'POST',
-    url: 'https://music.163.com/api/v3/playlist/detail',
-    params: {
+  const { body, statusCode } = await eapiRequest<SonglistDetail>(
+    '/api/v3/playlist/detail',
+    {
       id,
       n: limit,
       s: 8,
     },
-  })
+    cookie
+  )
   if (statusCode !== 200 || body.code !== pageInfo.successCode) throw new Error('wy songlistDetail failed')
 
   const listLimit = 1000
