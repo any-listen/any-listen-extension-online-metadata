@@ -1,3 +1,4 @@
 ### fix
 
-- fix wy songlist detail load
+- fix wy top list load
+- fix wy songlist count
