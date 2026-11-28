@@ -209,7 +209,7 @@ export const getListDetail = async (
     list,
     page,
     limit: listLimit,
-    total: body.playlist.trackIds.length,
+    total: body.playlist.trackCount,
     info: {
       play_count: formatPlayCount(body.playlist.playCount),
       name: body.playlist.name,
