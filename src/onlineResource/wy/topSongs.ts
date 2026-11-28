@@ -1,8 +1,9 @@
 import { dateFormat } from '@/shared/utils'
 
+import { getList as getMusicList } from './musicDetail'
 import type { TopSongs } from './types/topSongs'
 import type { TopSongsDetail } from './types/topSongsDetail'
-import { buildMusicList2, weapiRequest } from './utils'
+import { weapiRequest } from './utils'
 
 const boardList = [
   {
@@ -407,7 +408,7 @@ export const getList = async (
   id: string,
   date: string,
   page: number,
-  limit = 100000
+  limit = 1000
 ): Promise<{
   list: AnyListen_API.MusicInfoOnline[]
   total: number
@@ -417,13 +418,13 @@ export const getList = async (
 }> => {
   const { body, statusCode } = await weapiRequest<TopSongsDetail>('https://music.163.com/weapi/v3/playlist/detail', {
     id,
-    n: 100000,
+    n: 10000,
     p: 1,
   })
 
   if (statusCode !== 200 || body.code !== 200) throw new Error('wy topSongs getList failed')
 
-  const list = buildMusicList2({ songs: body.playlist.tracks, privileges: body.privileges })
+  const list = await getMusicList(body.playlist.trackIds.map((t) => t.id))
 
   return {
     list,
